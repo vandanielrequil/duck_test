@@ -5,6 +5,12 @@ public class PipeSlot : MonoBehaviour
     public PipeObject OccupiedObject;
     [HideInInspector] public int Index;
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(transform.position, 0.2f);
+    }
+
     public void ClearOccupant()
     {
         if (OccupiedObject != null && OccupiedObject.CurrentSlot == this)

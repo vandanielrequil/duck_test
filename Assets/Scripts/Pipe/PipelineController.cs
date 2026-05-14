@@ -6,11 +6,11 @@ using UnityEngine.Serialization;
 public class PipelineController : MonoBehaviour
 {
     [SerializeField] private List<PipeSlot> _slots = new();
-    [SerializeField] public float MoveInterval = 1.5f;
-    [SerializeField] public bool IsPaused;
+    public float MoveInterval = 1.5f;
+    public bool IsPaused;
     [SerializeField] private GameStateManager _gameState;
     private Coroutine _tickRoutine;
-
+    [SerializeField] private PipelineSpawner _spawner;
     public IReadOnlyList<PipeSlot> Slots => _slots;
 
     private void Awake()
@@ -52,19 +52,30 @@ public class PipelineController : MonoBehaviour
         if (_slots == null || _slots.Count == 0)
             return;
 
-        PipeSlot head = _slots[_slots.Count - 1];
-        PipeObject front = head.OccupiedObject;
-        if (front != null)
+        PipeObject removed = _slots[0].OccupiedObject;
+
+        if (removed != null)
         {
-            head.OccupiedObject = null;
-            front.CurrentSlot = null;
-            // _inspectorBehaviour.BeginInspection(front);
+            Destroy(removed.gameObject);
         }
 
-        for (int i = 0; i < _slots.Count - 1; i++)
-            _slots[i].OccupiedObject = _slots[i + 1].OccupiedObject;
+        List<PipeObject> shifted = new();
 
-        _slots[_slots.Count - 1].OccupiedObject = null;
+        for (int i = 1; i < _slots.Count; i++)
+        {
+            shifted.Add(_slots[i].OccupiedObject);
+        }
+
+        shifted.Add(null);
+
+        for (int i = 0; i < _slots.Count; i++)
+        {
+            _slots[i].SetOccupant(shifted[i]);
+        }
+
+        _slots[_slots.Count - 1].ClearOccupant();
+
+        _spawner.SpawnRandom();
 
         RefreshSlotBindings();
     }
