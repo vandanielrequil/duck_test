@@ -12,6 +12,7 @@ public class PipelineController : MonoBehaviour
     private Coroutine _tickRoutine;
     [SerializeField] private PipelineSpawner _spawner;
     public IReadOnlyList<PipeSlot> Slots => _slots;
+    public PipelineInteractionResolver InteractionResolver;
 
     private void Awake()
     {
@@ -90,5 +91,38 @@ public class PipelineController : MonoBehaviour
             obj.CurrentSlot = slot;
             obj.MoveTo(slot.transform.position);
         }
+    }
+
+    public bool TryMoveObjectBackward(
+        PipeObject obj,
+        int distance
+    )
+    {
+        if (obj.CurrentSlot == null)
+            return false;
+
+        int currentIndex = obj.CurrentSlot.Index;
+
+        int targetIndex =
+            Mathf.Min(
+                _slots.Count - 1,
+                currentIndex + distance
+            );
+
+        PipeSlot targetSlot = _slots[targetIndex];
+
+        targetSlot.ClearOccupant();
+
+        obj.CurrentSlot.ClearOccupant();
+
+        targetSlot.SetOccupant(obj);
+
+        obj.MoveTo(targetSlot.transform.position);
+
+        RefreshSlotBindings();
+
+        InteractionResolver.ResolveInteraction(obj, targetSlot);
+
+        return true;
     }
 }

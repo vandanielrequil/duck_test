@@ -11,25 +11,55 @@ public enum PipeArchetype
 public enum PipeObjectTag
 {
     None = 0,
+
     Yellow = 1 << 0,
-    Beak = 1 << 1,
-    Quack = 1 << 2,
+    Red = 1 << 1,
+    Blue = 1 << 2,
+
+    Beak = 1 << 3,
+    Quack = 1 << 4,
+
+    Paint = 1 << 5,
+    Heavy = 1 << 6,
 }
 
 public enum PipeInteractionKind
 {
+    Move,
     Merge,
-    Swap,
+    Shove,
+    Bounce,
     Reject,
     Eject,
 }
 
-[CreateAssetMenu(fileName = "PipeObjectData", menuName = "Pipe/Pipe Object Data")]
+[CreateAssetMenu(
+    fileName = "PipeObjectData",
+    menuName = "Pipe/Pipe Object Data"
+)]
 public class PipeObjectData : ScriptableObject
 {
+    [Header("Identity")]
+    public string ObjectId;
+
     public PipeArchetype Archetype;
-    public PipeObjectTag Tags = PipeObjectTag.None;
+
+    public PipeObjectTag Tags =
+        PipeObjectTag.None;
+
+    [Header("Visual")]
     public Sprite DisplaySprite;
+
     public GameObject SpawnPrefab;
-    public PipeInteractionKind DefaultInteraction = PipeInteractionKind.Reject;
+
+    [Header("Gameplay")]
+    public int Weight = 1;
+
+    public bool CanBeMerged = true;
+
+    public bool CanBeShoved = true;
+
+    public PipeInteractionKind
+        DefaultInteraction =
+            PipeInteractionKind.Reject;
 }

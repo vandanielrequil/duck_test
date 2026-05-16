@@ -4,8 +4,9 @@ using UnityEngine;
 public class PipelineSpawner : MonoBehaviour
 {
     [SerializeField] private PipelineController _pipeline;
-
     [SerializeField] private List<PipeObject> _prefabs;
+
+    [SerializeField] private float _spawnOffset = 2f;
 
     public void SpawnRandom()
     {
@@ -21,15 +22,17 @@ public class PipelineSpawner : MonoBehaviour
         int index = Random.Range(0, _prefabs.Count);
 
         Vector3 spawnPos =
-            tail.transform.position + Vector3.right * 2f;
+            tail.transform.position + Vector3.right * _spawnOffset;
 
         PipeObject spawned =
             Instantiate(
                 _prefabs[index],
-                tail.transform.position,
+                spawnPos,
                 Quaternion.identity
             );
 
         tail.SetOccupant(spawned);
+
+        spawned.MoveTo(tail.transform.position);
     }
 }
