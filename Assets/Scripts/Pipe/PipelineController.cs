@@ -22,7 +22,7 @@ public class PipelineController : MonoBehaviour
 
     private void Start()
     {
-        RefreshSlotBindings();
+        MoveOcupasToNewSlot();
     }
 
     private void OnEnable()
@@ -57,10 +57,11 @@ public class PipelineController : MonoBehaviour
 
         if (removed != null)
         {
-            Destroy(removed.gameObject);
+            Destroy(removed.gameObject); // TODO probably some animation from object should be called
         }
 
-        List<PipeObject> shifted = new();
+        // TODO shifted array have no sense, do in one cycle
+        List<PipeObject> shifted = [];
 
         for (int i = 1; i < _slots.Count; i++)
         {
@@ -73,15 +74,16 @@ public class PipelineController : MonoBehaviour
         {
             _slots[i].SetOccupant(shifted[i]);
         }
+        ////
 
-        _slots[_slots.Count - 1].ClearOccupant();
+        _slots[^1].ClearOccupant(); // last obj
 
         _spawner.SpawnRandom();
 
-        RefreshSlotBindings();
+        MoveOcupasToNewSlot();
     }
 
-    public void RefreshSlotBindings()
+    public void MoveOcupasToNewSlot() // TODO this probably should be combined with array above
     {
         foreach (PipeSlot slot in _slots)
         {
@@ -119,7 +121,7 @@ public class PipelineController : MonoBehaviour
 
         obj.MoveTo(targetSlot.transform.position);
 
-        RefreshSlotBindings();
+        MoveOcupasToNewSlot();
 
         InteractionResolver.ResolveInteraction(obj, targetSlot);
 
