@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2638229728488114212}
   - component: {fileID: 7151490735512782013}
   m_Layer: 0
-  m_Name: DuckRed
+  m_Name: DuckCommon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

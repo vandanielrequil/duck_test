@@ -61,7 +61,7 @@ public class PipelineController : MonoBehaviour
         }
 
         // TODO shifted array have no sense, do in one cycle
-        List<PipeObject> shifted = [];
+        List<PipeObject> shifted = new();
 
         for (int i = 1; i < _slots.Count; i++)
         {
@@ -113,17 +113,10 @@ public class PipelineController : MonoBehaviour
 
         PipeSlot targetSlot = _slots[targetIndex];
 
-        targetSlot.ClearOccupant();
-
-        obj.CurrentSlot.ClearOccupant();
-
-        targetSlot.SetOccupant(obj);
-
-        obj.MoveTo(targetSlot.transform.position);
+        InteractionResolver.ResolveInteraction(obj, targetSlot);
 
         MoveOcupasToNewSlot();
 
-        InteractionResolver.ResolveInteraction(obj, targetSlot);
 
         return true;
     }

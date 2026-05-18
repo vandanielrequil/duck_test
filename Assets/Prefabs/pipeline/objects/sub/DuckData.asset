@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29a7b1e6d80cf453194cad0352efb678, type: 3}
-  m_Name: PipeObjectData
+  m_Name: DuckData
   m_EditorClassIdentifier: Assembly-CSharp::PipeObjectData
   ObjectId: 
   Archetype: 0
   Tags: 0
   DisplaySprite: {fileID: 0}
   SpawnPrefab: {fileID: 0}
-  Weight: 1
+  Weight: 2
   CanBeMerged: 1
   CanBeShoved: 1
-  DefaultInteraction: 4
+  DefaultInteraction: 3
