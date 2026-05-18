@@ -22,6 +22,7 @@ public class PipelineInteractionResolver : MonoBehaviour
 
         InteractionResult kind =
             DetermineInteraction(movingObject, targetObject);
+        Debug.Log($"Interaction: {kind}");
 
         switch (kind)
         {
@@ -64,9 +65,6 @@ public class PipelineInteractionResolver : MonoBehaviour
         if (IsWeightBasedPair(m, t))
             return ResolveWeightBased(moving, target);
 
-        if (t == PipeArchetype.Modifier && m == PipeArchetype.Duck)
-            return InteractionResult.Shove;
-
         return InteractionResult.Bounce;
     }
 
@@ -91,9 +89,7 @@ public class PipelineInteractionResolver : MonoBehaviour
             || (moving == PipeArchetype.Duck
                 && target == PipeArchetype.Duck)
             || (moving == PipeArchetype.Modifier
-                && target == PipeArchetype.Modifier)
-            || (moving == PipeArchetype.Modifier
-                && target == PipeArchetype.Duck);
+                && target == PipeArchetype.Modifier);
     }
 
     private static bool IsWeightBasedPair(
@@ -109,7 +105,7 @@ public class PipelineInteractionResolver : MonoBehaviour
                 && target == PipeArchetype.Fake);
     }
 
-    private InteractionResult ResolveWeightBased(
+    private static InteractionResult ResolveWeightBased(
         PipeObject moving,
         PipeObject target
     )
@@ -129,7 +125,7 @@ public class PipelineInteractionResolver : MonoBehaviour
         return InteractionResult.Shove;
     }
 
-    private bool HasEmptySlotBehind(PipeObject target)
+    private static bool HasEmptySlotBehind(PipeObject target)
     {
         if (target.CurrentSlot == null)
             return false;
