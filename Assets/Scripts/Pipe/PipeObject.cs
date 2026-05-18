@@ -5,6 +5,7 @@ public class PipeObject : MonoBehaviour
 {
     public PipeObjectData Data;
     public PipeSlot CurrentSlot;
+    public PipeObject hardcodedMerge;
 
     [SerializeField] private float _followSpeed = 8f;
     // [SerializeField] private float _moveScale = 1.05f;
@@ -83,5 +84,33 @@ public class PipeObject : MonoBehaviour
 
     public void MergeWith(PipeObject other)
     {
+        if (hardcodedMerge == null)
+            return;
+
+        PipeSlot slot = CurrentSlot;
+        Vector3 spawnPos = transform.position;
+
+        if (slot != null)
+            slot.ClearOccupant();
+
+        if (other != null && other.CurrentSlot != null)
+            other.CurrentSlot.ClearOccupant();
+
+        PipeObject merged = Instantiate(
+            hardcodedMerge,
+            spawnPos,
+            Quaternion.identity
+        );
+
+        if (slot != null)
+        {
+            slot.SetOccupant(merged);
+            merged.MoveTo(slot.transform.position);
+        }
+
+        if (other != null)
+            Destroy(other.gameObject);
+
+        Destroy(gameObject);
     }
 }
