@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class ThrowSystem : MonoBehaviour
 {
@@ -11,9 +10,7 @@ public class ThrowSystem : MonoBehaviour
     [Header("Slingshot")]
     [SerializeField] private float _minPullWorld = 0.35f;
     [SerializeField] private float _maxPullWorld = 3.5f;
-    [SerializeField] private float _aimStretchFactor = 0.35f;
     [SerializeField] private float _minAimAlignment = 0.25f;
-    [SerializeField] private float _pickRadius = 0.6f;
 
     [Header("Ballistics")]
     [SerializeField] private float _gravity = 14f;
@@ -25,12 +22,10 @@ public class ThrowSystem : MonoBehaviour
     [SerializeField] private LineRenderer _trajectoryLine;
     [SerializeField] private float _lineZ = -1f;
 
-    private PipeObject _aimingObject;
-    private Vector2 _aimAnchor;
     private Coroutine _flightRoutine;
     private Vector3[] _trajectoryPoints;
 
-    private bool IsFlying => _flightRoutine != null;
+    public bool IsBusy => _flightRoutine != null;
 
     private PipelineInteractionResolver Resolver =>
         _pipeline != null
@@ -52,120 +47,165 @@ public class ThrowSystem : MonoBehaviour
             _trajectoryLine.enabled = false;
     }
 
-    private void Update()
-    {
-        Pointer pointer = Pointer.current;
-        if (pointer == null || _pipeline == null)
-            return;
-
-        if (_aimingObject != null)
-        {
-            if (pointer.press.isPressed)
-                UpdateAim(pointer.position.ReadValue());
-
-            if (pointer.press.wasReleasedThisFrame)
-                ReleaseAim(pointer.position.ReadValue());
-
-            return;
-        }
-
-        if (IsFlying || !IsPlayableState())
-            return;
-
-        if (pointer.press.wasPressedThisFrame)
-            TryBeginAim(pointer.position.ReadValue());
-    }
-
     private bool IsPlayableState() =>
         _gameState == null
         || _gameState.Current == PipeGameState.Playing;
 
-    private void TryBeginAim(Vector2 screenPos)
+    /// <summary>
+    /// Launch from pull vector (anchor = object position, pull = anchor - finger).
+    /// </summary>
+    public bool TryLaunchFromPull(PipeObject obj, Vector2 pull)
+    {
+        return TryLaunchFromPull(obj, pull, logFailures: false);
+    }
+
+    public bool TryLaunchFromPull(
+        PipeObject obj,
+        Vector2 pull,
+        bool logFailures
+    )
     {
         if (!IsPlayableState())
-            return;
-
-        PipeObject hit = PickPipeObject(screenPos);
-        if (hit == null || hit.CurrentSlot == null)
-            return;
-
-        _aimingObject = hit;
-        _aimAnchor = hit.transform.position;
-
-        _pipeline.IsPaused = true;
-        hit.BeginAim();
-    }
-
-    private void UpdateAim(Vector2 screenPos)
-    {
-        Vector2 pull = _aimAnchor - ScreenToWorld(screenPos);
-
-        _aimingObject.SetAimPosition(
-            _aimAnchor - pull * _aimStretchFactor
-        );
-
-        DrawTrajectoryPreview(_aimAnchor, pull);
-    }
-
-    private void ReleaseAim(Vector2 screenPos)
-    {
-        PipeObject obj = _aimingObject;
-        Vector2 pull = _aimAnchor - ScreenToWorld(screenPos);
-        int slotOffset = ComputeSlotOffset(obj, pull);
-
-        ClearAim();
-
-        if (slotOffset <= 0)
         {
-            obj.CancelAim();
-            _pipeline.IsPaused = false;
-            return;
+            if (logFailures)
+                Debug.Log("[Throw] Not in Playing state.");
+            return false;
         }
 
+        if (IsBusy)
+        {
+            if (logFailures)
+                Debug.Log("[Throw] Previous flight still in progress.");
+            return false;
+        }
+
+        if (obj == null || _pipeline == null)
+            return false;
+
+        if (obj.CurrentSlot == null)
+        {
+            if (logFailures)
+                Debug.Log("[Throw] Object has no slot.");
+            return false;
+        }
+
+        if (!TryGetSlotOffset(obj, pull, out int slotOffset, out string failReason))
+        {
+            if (logFailures)
+                Debug.Log($"[Throw] Launch rejected: {failReason}");
+            return false;
+        }
+
+        HidePreview();
+        _pipeline.IsPaused = true;
         _flightRoutine =
             StartCoroutine(FlyAndLandRoutine(obj, slotOffset));
+
+        return true;
     }
 
-    private void ClearAim()
+    public bool TryGetSlotOffset(
+        PipeObject obj,
+        Vector2 pull,
+        out int slotOffset,
+        out string failReason
+    )
     {
-        _aimingObject = null;
-        HideTrajectory();
-    }
+        slotOffset = 0;
+        failReason = null;
 
-    private int ComputeSlotOffset(PipeObject obj, Vector2 pull)
-    {
+        if (obj == null || _pipeline == null)
+        {
+            failReason = "no object or pipeline";
+            return false;
+        }
+
         float pullMag = pull.magnitude;
         float power = GetThrowPower(obj);
         float minPull = _minPullWorld / power;
         float maxPull = _maxPullWorld * power;
 
         if (pullMag < minPull)
-            return 0;
+        {
+            failReason =
+                $"pull too short ({pullMag:F2} < {minPull:F2}) — drag finger farther from the object";
+            return false;
+        }
 
-        float align = Vector2.Dot(
-            pull / pullMag,
-            _pipeline.GetPipelineBackward()
-        );
+        Vector2 backward = _pipeline.GetPipelineBackward();
+        float align = Vector2.Dot(pull / pullMag, backward);
 
         if (align < _minAimAlignment)
-            return 0;
+        {
+            failReason =
+                $"bad aim (alignment {align:F2} < {_minAimAlignment:F2}) — pull toward the tail of the pipeline (yellow arrow in axis gizmo)";
+            return false;
+        }
 
         int maxOffset = _pipeline.GetMaxBackwardSlots(obj);
         if (maxOffset <= 0)
-            return 0;
+        {
+            failReason = "object is already at the last slot";
+            return false;
+        }
 
-        float t = Mathf.InverseLerp(
-            minPull,
-            maxPull,
-            pullMag
-        ) * align;
-
-        return Mathf.Clamp(
+        float t = Mathf.InverseLerp(minPull, maxPull, pullMag) * align;
+        slotOffset = Mathf.Clamp(
             Mathf.RoundToInt(Mathf.Lerp(1f, maxOffset, t)),
             1,
             maxOffset
         );
+        return true;
     }
+
+    public void PreviewLaunch(PipeObject obj, Vector2 pull)
+    {
+        if (obj == null || _trajectoryLine == null || _pipeline == null)
+            return;
+
+        int offset = ComputeSlotOffset(obj, pull);
+        if (offset <= 0)
+        {
+            HidePreview();
+            return;
+        }
+
+        PipeSlot target =
+            _pipeline.GetSlotAtOffset(obj, offset);
+
+        if (target == null)
+        {
+            HidePreview();
+            return;
+        }
+
+        Vector2 anchor = obj.transform.position;
+
+        FillTrajectoryPoints(
+            BuildFlightParams(
+                obj,
+                offset,
+                anchor,
+                target.transform.position
+            ),
+            anchor
+        );
+
+        _trajectoryLine.positionCount = _trajectoryPoints.Length;
+        _trajectoryLine.SetPositions(_trajectoryPoints);
+        _trajectoryLine.enabled = true;
+    }
+
+    public void HidePreview()
+    {
+        if (_trajectoryLine != null)
+            _trajectoryLine.enabled = false;
+    }
+
+    private int ComputeSlotOffset(PipeObject obj, Vector2 pull) =>
+        TryGetSlotOffset(obj, pull, out int offset, out _)
+            ? offset
+            : 0;
 
     private static float GetThrowPower(PipeObject obj) =>
         obj?.Data != null ? obj.Data.ThrowPower : 1f;
@@ -213,7 +253,6 @@ public class ThrowSystem : MonoBehaviour
 
         if (targetSlot == null)
         {
-            obj.CancelAim();
             _pipeline.IsPaused = false;
             _flightRoutine = null;
             yield break;
@@ -268,42 +307,6 @@ public class ThrowSystem : MonoBehaviour
         _flightRoutine = null;
     }
 
-    private void DrawTrajectoryPreview(Vector2 anchor, Vector2 pull)
-    {
-        if (_trajectoryLine == null)
-            return;
-
-        int offset = ComputeSlotOffset(_aimingObject, pull);
-        if (offset <= 0)
-        {
-            HideTrajectory();
-            return;
-        }
-
-        PipeSlot target =
-            _pipeline.GetSlotAtOffset(_aimingObject, offset);
-
-        if (target == null)
-        {
-            HideTrajectory();
-            return;
-        }
-
-        FillTrajectoryPoints(
-            BuildFlightParams(
-                _aimingObject,
-                offset,
-                anchor,
-                target.transform.position
-            ),
-            anchor
-        );
-
-        _trajectoryLine.positionCount = _trajectoryPoints.Length;
-        _trajectoryLine.SetPositions(_trajectoryPoints);
-        _trajectoryLine.enabled = true;
-    }
-
     private void FillTrajectoryPoints(
         FlightParams flight,
         Vector2 start
@@ -324,12 +327,6 @@ public class ThrowSystem : MonoBehaviour
             _trajectoryPoints[i] =
                 new Vector3(p.x, p.y, _lineZ);
         }
-    }
-
-    private void HideTrajectory()
-    {
-        if (_trajectoryLine != null)
-            _trajectoryLine.enabled = false;
     }
 
     private static Vector2 SampleBallistic(
@@ -358,59 +355,6 @@ public class ThrowSystem : MonoBehaviour
             delta.x / t,
             (delta.y + 0.5f * gravity * t * t) / t
         );
-    }
-
-    private PipeObject PickPipeObject(Vector2 screenPos)
-    {
-        Vector2 world = ScreenToWorld(screenPos);
-
-        Collider2D hit =
-            Physics2D.OverlapCircle(world, _pickRadius);
-
-        if (hit != null)
-        {
-            PipeObject picked =
-                hit.GetComponentInParent<PipeObject>();
-
-            if (picked != null)
-                return picked;
-        }
-
-        PipeObject best = null;
-        float bestDist = _pickRadius;
-
-        foreach (PipeSlot slot in _pipeline.Slots)
-        {
-            PipeObject obj = slot.OccupiedObject;
-            if (obj == null)
-                continue;
-
-            float dist = Vector2.Distance(
-                world,
-                obj.transform.position
-            );
-
-            if (dist < bestDist)
-            {
-                bestDist = dist;
-                best = obj;
-            }
-        }
-
-        return best;
-    }
-
-    private Vector2 ScreenToWorld(Vector2 screenPos)
-    {
-        float depth = Mathf.Abs(
-            _camera.transform.position.z
-        );
-
-        Vector3 world = _camera.ScreenToWorldPoint(
-            new Vector3(screenPos.x, screenPos.y, depth)
-        );
-
-        return world;
     }
 
     private readonly struct FlightParams

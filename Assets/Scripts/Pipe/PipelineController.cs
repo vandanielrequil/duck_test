@@ -130,4 +130,35 @@ public class PipelineController : MonoBehaviour
 
         return _slots[targetIndex];
     }
+
+    /// <summary>
+    /// Closest occupied pipe object by world X (batter is not slot-aligned).
+    /// </summary>
+    public PipeObject GetOccupantNearWorldX(
+        float worldX,
+        float maxHorizontalDistance
+    )
+    {
+        if (_slots == null || _slots.Count == 0)
+            return null;
+
+        PipeObject best = null;
+        float bestDist = maxHorizontalDistance;
+
+        foreach (PipeSlot slot in _slots)
+        {
+            PipeObject obj = slot.OccupiedObject;
+            if (obj == null)
+                continue;
+
+            float dist = Mathf.Abs(obj.transform.position.x - worldX);
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                best = obj;
+            }
+        }
+
+        return best;
+    }
 }
