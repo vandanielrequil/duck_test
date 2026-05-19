@@ -1,7 +1,16 @@
+using System.Collections;
 using UnityEngine;
 
 public class PipelineInteractionResolver : MonoBehaviour
 {
+    [SerializeField] private PipelineController _pipeline;
+
+    private void Awake()
+    {
+        if (_pipeline == null)
+            _pipeline = FindAnyObjectByType<PipelineController>();
+    }
+
     public InteractionResult ResolveInteraction(
         PipeObject movingObject,
         PipeSlot targetSlot
@@ -22,6 +31,7 @@ public class PipelineInteractionResolver : MonoBehaviour
 
         InteractionResult kind =
             DetermineInteraction(movingObject, targetObject);
+
         Debug.Log($"Interaction: {kind}");
 
         switch (kind)
@@ -48,11 +58,14 @@ public class PipelineInteractionResolver : MonoBehaviour
         return kind;
     }
 
-    private static InteractionResult DetermineInteraction(
+    private InteractionResult DetermineInteraction(
         PipeObject moving,
         PipeObject target
     )
     {
+        if (moving.Data == null || target.Data == null)
+            return InteractionResult.Bounce;
+
         PipeArchetype m = moving.Data.Archetype;
         PipeArchetype t = target.Data.Archetype;
 
@@ -105,7 +118,7 @@ public class PipelineInteractionResolver : MonoBehaviour
                 && target == PipeArchetype.Fake);
     }
 
-    private static InteractionResult ResolveWeightBased(
+    private InteractionResult ResolveWeightBased(
         PipeObject moving,
         PipeObject target
     )
@@ -125,46 +138,32 @@ public class PipelineInteractionResolver : MonoBehaviour
         return InteractionResult.Shove;
     }
 
-    private static bool HasEmptySlotBehind(PipeObject target)
+    private bool HasEmptySlotBehind(PipeObject target)
     {
-        if (target.CurrentSlot == null)
-            return false;
-
-        PipelineController pipeline =
-            FindAnyObjectByType<PipelineController>();
-
-        if (pipeline == null)
+        if (_pipeline == null || target.CurrentSlot == null)
             return false;
 
         int behindIndex = target.CurrentSlot.Index + 1;
 
-        if (behindIndex >= pipeline.Slots.Count)
+        if (behindIndex >= _pipeline.Slots.Count)
             return false;
 
-        return pipeline.Slots[behindIndex].OccupiedObject == null;
+        return _pipeline.Slots[behindIndex].OccupiedObject == null;
     }
 
     private void MoveTargetBehind(PipeObject target)
     {
-        if (target.CurrentSlot == null)
-            return;
-
-        PipelineController pipeline =
-            FindAnyObjectByType<PipelineController>();
-
-        if (pipeline == null)
+        if (_pipeline == null || target.CurrentSlot == null)
             return;
 
         int behindIndex = target.CurrentSlot.Index + 1;
 
-        if (behindIndex >= pipeline.Slots.Count)
+        if (behindIndex >= _pipeline.Slots.Count)
             return;
 
-        PipeSlot behindSlot =
-            pipeline.Slots[behindIndex] as PipeSlot;
+        PipeSlot behindSlot = _pipeline.Slots[behindIndex];
 
-        if (behindSlot == null
-            || behindSlot.OccupiedObject != null)
+        if (behindSlot.OccupiedObject != null)
             return;
 
         PipeSlot fromSlot = target.CurrentSlot;
@@ -173,7 +172,7 @@ public class PipelineInteractionResolver : MonoBehaviour
         target.MoveTo(behindSlot.transform.position);
     }
 
-    private void MoveObjectToSlot(
+    private static void MoveObjectToSlot(
         PipeObject obj,
         PipeSlot slot
     )
@@ -185,7 +184,7 @@ public class PipelineInteractionResolver : MonoBehaviour
         obj.MoveTo(slot.transform.position);
     }
 
-    private void MergeObjects(
+    private static void MergeObjects(
         PipeObject moving,
         PipeObject target
     )
@@ -203,15 +202,28 @@ public class PipelineInteractionResolver : MonoBehaviour
 
     private void BounceObject(PipeObject obj)
     {
-        Vector3 bouncePosition =
-            obj.transform.position + Vector3.down;
-
-        obj.MoveTo(bouncePosition);
-
         if (obj.CurrentSlot != null)
             obj.CurrentSlot.ClearOccupant();
 
-        Destroy(obj.gameObject);
+        if (_pipeline != null)
+            _pipeline.IsPaused = true;
+
+        obj.MoveTo(obj.transform.position + Vector3.down);
+        StartCoroutine(DestroyAfterBounce(obj, 0.35f));
+    }
+
+    private IEnumerator DestroyAfterBounce(
+        PipeObject obj,
+        float delay
+    )
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (obj != null)
+            Destroy(obj.gameObject);
+
+        if (_pipeline != null)
+            _pipeline.IsPaused = false;
     }
 }
 

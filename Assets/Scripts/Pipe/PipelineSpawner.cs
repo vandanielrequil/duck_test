@@ -10,6 +10,9 @@ public class PipelineSpawner : MonoBehaviour
 
     public void SpawnRandom()
     {
+        if (_prefabs == null || _prefabs.Count == 0)
+            return;
+
         PipeSlot tail =
             _pipeline.Slots[_pipeline.Slots.Count - 1];
 

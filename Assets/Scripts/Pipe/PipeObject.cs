@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PipeObject : MonoBehaviour
 {
@@ -8,20 +7,13 @@ public class PipeObject : MonoBehaviour
     public PipeObject hardcodedMerge;
 
     [SerializeField] private float _followSpeed = 8f;
-    // [SerializeField] private float _moveScale = 1.05f;
-    // [SerializeField] private float _idleScale = 1f;
 
     private Vector2 _targetPosition;
     private float _visualZ;
-
-    private Vector2 _dragStart;
-
-    [SerializeField] private PipelineController _pipeline;
+    private bool _followEnabled = true;
 
     private void Awake()
     {
-        _pipeline = FindAnyObjectByType<PipelineController>();
-
         _visualZ = transform.position.z;
         _targetPosition = transform.position;
     }
@@ -30,48 +22,52 @@ public class PipeObject : MonoBehaviour
     {
         targetWorldPosition.z = _visualZ;
         _targetPosition = targetWorldPosition;
+        _followEnabled = true;
+    }
 
-        // transform.localScale = Vector3.one * _moveScale;
+    public void BeginAim() => _followEnabled = false;
+
+    public void CancelAim()
+    {
+        if (CurrentSlot != null)
+            MoveTo(CurrentSlot.transform.position);
+        else
+            _followEnabled = true;
+    }
+
+    public void SetAimPosition(Vector2 worldPosition) =>
+        SetWorldPosition(worldPosition);
+
+    public void BeginFlight() => _followEnabled = false;
+
+    public void SetFlightPosition(Vector2 worldPosition) =>
+        SetWorldPosition(worldPosition);
+
+    public void EndFlight()
+    {
+        _targetPosition = transform.position;
+        _followEnabled = true;
+    }
+
+    private void SetWorldPosition(Vector2 worldPosition)
+    {
+        transform.position = new Vector3(
+            worldPosition.x,
+            worldPosition.y,
+            _visualZ
+        );
     }
 
     private void Update()
     {
+        if (!_followEnabled)
+            return;
+
         transform.position = Vector3.Lerp(
             transform.position,
             _targetPosition,
             _followSpeed * Time.deltaTime
         );
-
-        // transform.localScale = Vector3.Lerp(
-        //     transform.localScale,
-        //     Vector3.one * _idleScale,
-        //     10f * Time.deltaTime
-        // );
-    }
-
-    private void OnMouseDown()
-    {
-        _dragStart = Pointer.current.position.ReadValue();
-    }
-
-    private void OnMouseUp()
-    {
-        Vector2 delta =
-            Pointer.current.position.ReadValue() - _dragStart;
-
-        if (delta.y > 50f)
-        {
-            _pipeline.TryMoveObjectBackward(this, 2);
-        }
-        else if (delta.y < -50f)
-        {
-            if (CurrentSlot != null)
-            {
-                CurrentSlot.ClearOccupant();
-            }
-
-            Destroy(gameObject);
-        }
     }
 
     public void OnInspect()
@@ -84,9 +80,6 @@ public class PipeObject : MonoBehaviour
 
     public void MergeWith(PipeObject other)
     {
-        if (hardcodedMerge == null)
-            return;
-
         PipeSlot slot = CurrentSlot;
         Vector3 spawnPos = transform.position;
 
@@ -95,6 +88,14 @@ public class PipeObject : MonoBehaviour
 
         if (other != null && other.CurrentSlot != null)
             other.CurrentSlot.ClearOccupant();
+
+        if (hardcodedMerge == null)
+        {
+            Debug.LogError("Hardcoded merge is not set");
+            Destroy(gameObject);
+            Destroy(other.gameObject);
+            return;
+        }
 
         PipeObject merged = Instantiate(
             hardcodedMerge,

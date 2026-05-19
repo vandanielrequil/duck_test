@@ -17,7 +17,8 @@ MonoBehaviour:
   Tags: 0
   DisplaySprite: {fileID: 0}
   SpawnPrefab: {fileID: 0}
-  Weight: 4
+  Weight: 10
+  LaunchAccelModifier: 1
   CanBeMerged: 1
   CanBeShoved: 0
   DefaultInteraction: 3

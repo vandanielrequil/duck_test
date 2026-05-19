@@ -95,29 +95,39 @@ public class PipelineController : MonoBehaviour
         }
     }
 
-    public bool TryMoveObjectBackward(
+    public Vector2 GetPipelineBackward()
+    {
+        if (_slots == null || _slots.Count < 2)
+            return Vector2.right;
+
+        Vector2 first = _slots[0].transform.position;
+        Vector2 last = _slots[^1].transform.position;
+        return (last - first).normalized;
+    }
+
+    public int GetMaxBackwardSlots(PipeObject obj)
+    {
+        if (obj?.CurrentSlot == null || _slots == null)
+            return 0;
+
+        return _slots.Count - 1 - obj.CurrentSlot.Index;
+    }
+
+    public PipeSlot GetSlotAtOffset(
         PipeObject obj,
-        int distance
+        int offset
     )
     {
-        if (obj.CurrentSlot == null)
-            return false;
+        if (obj?.CurrentSlot == null || _slots == null)
+            return null;
 
-        int currentIndex = obj.CurrentSlot.Index;
+        int targetIndex = obj.CurrentSlot.Index + offset;
+        targetIndex = Mathf.Clamp(
+            targetIndex,
+            0,
+            _slots.Count - 1
+        );
 
-        int targetIndex =
-            Mathf.Min(
-                _slots.Count - 1,
-                currentIndex + distance
-            );
-
-        PipeSlot targetSlot = _slots[targetIndex];
-
-        InteractionResolver.ResolveInteraction(obj, targetSlot);
-
-        MoveOcupasToNewSlot();
-
-
-        return true;
+        return _slots[targetIndex];
     }
 }

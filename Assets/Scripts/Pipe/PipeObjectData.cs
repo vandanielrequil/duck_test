@@ -55,6 +55,11 @@ public class PipeObjectData : ScriptableObject
     [Header("Gameplay")]
     public int Weight = 1;
 
+    [Tooltip(
+        "Throw range and launch speed multiplier. 1 = default."
+    )]
+    public float LaunchAccelModifier = 1f;
+
     public bool CanBeMerged = true;
 
     public bool CanBeShoved = true;
@@ -62,4 +67,8 @@ public class PipeObjectData : ScriptableObject
     public PipeInteractionKind
         DefaultInteraction =
             PipeInteractionKind.Reject;
+
+    public float ThrowPower =>
+        LaunchAccelModifier
+        / Mathf.Max(1, Weight);
 }

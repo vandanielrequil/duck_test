@@ -20,7 +20,13 @@ public class PipeSlot : MonoBehaviour
 
     public void SetOccupant(PipeObject obj)
     {
+        if (OccupiedObject != null
+            && OccupiedObject != obj
+            && OccupiedObject.CurrentSlot == this)
+            OccupiedObject.CurrentSlot = null;
+
         OccupiedObject = obj;
+
         if (obj != null)
             obj.CurrentSlot = this;
     }
