@@ -11,6 +11,7 @@ public class PipelineController : MonoBehaviour
     [SerializeField] private GameStateManager _gameState;
     private Coroutine _tickRoutine;
     [SerializeField] private PipelineSpawner _spawner;
+    [SerializeField] private float _homerunBeyondSpacing = 1f;
     public IReadOnlyList<PipeSlot> Slots => _slots;
     public PipelineInteractionResolver InteractionResolver;
 
@@ -95,7 +96,7 @@ public class PipelineController : MonoBehaviour
         }
     }
 
-    public Vector2 GetPipelineBackward()
+    public Vector2 GetPipelineTangent()
     {
         if (_slots == null || _slots.Count < 2)
             return Vector2.right;
@@ -103,6 +104,54 @@ public class PipelineController : MonoBehaviour
         Vector2 first = _slots[0].transform.position;
         Vector2 last = _slots[^1].transform.position;
         return (last - first).normalized;
+    }
+
+    public Vector2 GetPipelineBackward() => GetPipelineTangent();
+
+    public float GetAverageSlotSpacing()
+    {
+        if (_slots == null || _slots.Count < 2)
+            return 1f;
+
+        float total = 0f;
+        int segments = 0;
+
+        for (int i = 1; i < _slots.Count; i++)
+        {
+            total += Vector2.Distance(
+                _slots[i - 1].transform.position,
+                _slots[i].transform.position
+            );
+            segments++;
+        }
+
+        return segments > 0 ? total / segments : 1f;
+    }
+
+    /// <summary>
+    /// World points just outside the first / last slot along the pipeline.
+    /// Left = beyond slot 0, Right = beyond the last slot.
+    /// </summary>
+    public bool TryGetHomerunLandingPoints(
+        out Vector2 leftBeyond,
+        out Vector2 rightBeyond
+    )
+    {
+        leftBeyond = Vector2.zero;
+        rightBeyond = Vector2.zero;
+
+        if (_slots == null || _slots.Count == 0)
+            return false;
+
+        Vector2 tangent = GetPipelineTangent();
+        float beyond = GetAverageSlotSpacing() * _homerunBeyondSpacing;
+
+        Vector2 first = _slots[0].transform.position;
+        Vector2 last = _slots[^1].transform.position;
+
+        leftBeyond = first - tangent * beyond;
+        rightBeyond = last + tangent * beyond;
+        return true;
     }
 
     public int GetMaxBackwardSlots(PipeObject obj)
@@ -113,15 +162,36 @@ public class PipelineController : MonoBehaviour
         return _slots.Count - 1 - obj.CurrentSlot.Index;
     }
 
+    /// <summary>Slots toward index 0 (front / eject end).</summary>
+    public int GetMaxForwardSlots(PipeObject obj)
+    {
+        if (obj?.CurrentSlot == null || _slots == null)
+            return 0;
+
+        return obj.CurrentSlot.Index;
+    }
+
+    public int GetMaxReachSlots(PipeObject obj)
+    {
+        if (obj?.CurrentSlot == null)
+            return 0;
+
+        return Mathf.Max(
+            GetMaxForwardSlots(obj),
+            GetMaxBackwardSlots(obj)
+        );
+    }
+
+    /// <param name="signedOffset">Negative = toward slot 0, positive = toward last slot.</param>
     public PipeSlot GetSlotAtOffset(
         PipeObject obj,
-        int offset
+        int signedOffset
     )
     {
         if (obj?.CurrentSlot == null || _slots == null)
             return null;
 
-        int targetIndex = obj.CurrentSlot.Index + offset;
+        int targetIndex = obj.CurrentSlot.Index + signedOffset;
         targetIndex = Mathf.Clamp(
             targetIndex,
             0,

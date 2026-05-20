@@ -58,6 +58,27 @@ public class PipelineInteractionResolver : MonoBehaviour
         return kind;
     }
 
+    public InteractionResult ResolveHomerun(
+        PipeObject movingObject,
+        bool toLeft
+    )
+    {
+        if (movingObject == null)
+            return InteractionResult.None;
+
+        if (movingObject.CurrentSlot != null)
+            movingObject.CurrentSlot.ClearOccupant();
+
+        InteractionResult kind = toLeft
+            ? InteractionResult.HomerunLeft
+            : InteractionResult.HomerunRight;
+
+        Debug.Log($"Interaction: {kind}");
+
+        Destroy(movingObject.gameObject);
+        return kind;
+    }
+
     private InteractionResult DetermineInteraction(
         PipeObject moving,
         PipeObject target
@@ -72,10 +93,10 @@ public class PipelineInteractionResolver : MonoBehaviour
         if (IsMergePair(m, t))
             return InteractionResult.Merge;
 
-        if (IsShovePair(m, t))
-            return InteractionResult.Shove;
-
         if (IsWeightBasedPair(m, t))
+            return ResolveWeightBased(moving, target);
+
+        if (IsShovePair(m, t))
             return ResolveWeightBased(moving, target);
 
         return InteractionResult.Bounce;
@@ -123,8 +144,8 @@ public class PipelineInteractionResolver : MonoBehaviour
         PipeObject target
     )
     {
-        int movingWeight = moving.Data.Weight;
-        int targetWeight = target.Data.Weight;
+        int movingWeight = GetWeight(moving);
+        int targetWeight = GetWeight(target);
 
         if (movingWeight > targetWeight)
             return InteractionResult.Shove;
@@ -137,6 +158,9 @@ public class PipelineInteractionResolver : MonoBehaviour
 
         return InteractionResult.Shove;
     }
+
+    private static int GetWeight(PipeObject obj) =>
+        Mathf.Max(1, obj?.Data?.Weight ?? 1);
 
     private bool HasEmptySlotBehind(PipeObject target)
     {
@@ -233,5 +257,7 @@ public enum InteractionResult
     Move,
     Merge,
     Shove,
-    Bounce
+    Bounce,
+    HomerunLeft,
+    HomerunRight
 }

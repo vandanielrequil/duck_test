@@ -23,6 +23,14 @@ public class BatterController : MonoBehaviour
     [SerializeField] private Transform _stickPivot;
     [SerializeField] private bool _logLaunchFailures = true;
 
+    [Header("Strike zone")]
+    [Tooltip(
+        "Radius around the batter. Inside: no movement, strike aim starts here. "
+        + "Outside: move along the rail; release below the rail to hit."
+    )]
+    [Min(0f)]
+    [SerializeField] private float _movementDeadZoneRadius = 1.2f;
+
     private Vector2 _velocity;
     private bool _dragging;
     private Collider2D _collider;
@@ -135,7 +143,12 @@ public class BatterController : MonoBehaviour
 
     private void UpdateDrag(Vector2 worldPos)
     {
-        DriveAlongAxis(worldPos);
+        if (IsInsideMovementDeadZone(worldPos))
+            BrakeMovement();
+        else
+        {
+            DriveAlongAxis(worldPos);
+        }
 
         bool below = _axis.IsBelowAxis(worldPos, _belowAxisThreshold);
         PipeObject target = GetObjectAbove();
@@ -161,10 +174,10 @@ public class BatterController : MonoBehaviour
 
         if (below)
             TrySlingshotLaunch(worldPos);
-        else if (_logLaunchFailures)
+        else if (_logLaunchFailures && !below)
             Debug.Log(
-                "[Batter] Released above the rail — no strike. "
-                + "Release the finger below the cyan line (toward the batter)."
+                "[Batter] Released on or above the movement line — "
+                + "release below the rail to strike."
             );
 
         _dragging = false;
@@ -201,6 +214,17 @@ public class BatterController : MonoBehaviour
             pull,
             _logLaunchFailures
         );
+    }
+
+    private bool IsInsideMovementDeadZone(Vector2 worldPos) =>
+        _movementDeadZoneRadius > 0f
+        && Vector2.Distance(worldPos, transform.position)
+            <= _movementDeadZoneRadius;
+
+    private void BrakeMovement()
+    {
+        float damp = Mathf.Clamp01(_velocityDamping * Time.deltaTime * 2.5f);
+        _velocity *= 1f - damp;
     }
 
     private void DriveAlongAxis(Vector2 worldPos)
@@ -268,5 +292,14 @@ public class BatterController : MonoBehaviour
             new Vector3(screenPos.x, screenPos.y, depth)
         );
         return world;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (_movementDeadZoneRadius <= 0f)
+            return;
+
+        Gizmos.color = new Color(1f, 0.55f, 0.1f, 0.35f);
+        Gizmos.DrawWireSphere(transform.position, _movementDeadZoneRadius);
     }
 }

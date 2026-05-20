@@ -1,14 +1,12 @@
 using UnityEngine;
 
 /// <summary>
-/// Horizontal rail for the batter. Assign two scene transforms (left / right bounds).
+/// Rail for the batter. Assign left / right bounds on the movement line.
 /// </summary>
 public class BatterMovementAxis : MonoBehaviour
 {
     [SerializeField] private Transform _left;
     [SerializeField] private Transform _right;
-    [Tooltip("A point on the side of the axis where the batter stands (defines \"below\").")]
-    [SerializeField] private Transform _belowSideHint;
 
     public Vector2 Left => _left != null ? (Vector2)_left.position : (Vector2)transform.position;
     public Vector2 Right => _right != null ? (Vector2)_right.position : (Vector2)transform.position;
@@ -26,24 +24,6 @@ public class BatterMovementAxis : MonoBehaviour
 
     public float Length => Vector2.Distance(Left, Right);
 
-    public Vector2 BelowNormal
-    {
-        get
-        {
-            Vector2 n = new Vector2(-Tangent.y, Tangent.x);
-            Vector2 mid = (Left + Right) * 0.5f;
-
-            if (_belowSideHint != null)
-            {
-                Vector2 toHint = (Vector2)_belowSideHint.position - mid;
-                if (Vector2.Dot(n, toHint) < 0f)
-                    n = -n;
-            }
-
-            return n;
-        }
-    }
-
     public Vector2 ClosestPointOnAxis(Vector2 worldPoint)
     {
         Vector2 delta = Right - Left;
@@ -58,16 +38,12 @@ public class BatterMovementAxis : MonoBehaviour
     public Vector2 ClampOnAxis(Vector2 worldPoint) =>
         ClosestPointOnAxis(worldPoint);
 
-    /// <summary>Positive when the point is on the batter side of the rail.</summary>
+    /// <summary>
+    /// Positive when the point is below the movement line (lower world Y than the rail).
+    /// </summary>
     public float SignedDistanceBelow(Vector2 worldPoint)
     {
         Vector2 onAxis = ClosestPointOnAxis(worldPoint);
-        Vector2 offset = worldPoint - onAxis;
-
-        if (_belowSideHint != null)
-            return Vector2.Dot(offset, BelowNormal);
-
-        // Without a hint: treat lower world Y as "below" (batter under a horizontal rail).
         return onAxis.y - worldPoint.y;
     }
 
@@ -83,12 +59,5 @@ public class BatterMovementAxis : MonoBehaviour
         Gizmos.DrawLine(_left.position, _right.position);
         Gizmos.DrawSphere(_left.position, 0.12f);
         Gizmos.DrawSphere(_right.position, 0.12f);
-
-        Vector3 mid = (_left.position + _right.position) * 0.5f;
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(
-            mid,
-            mid + (Vector3)(BelowNormal * 0.5f)
-        );
     }
 }

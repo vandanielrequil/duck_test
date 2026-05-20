@@ -56,7 +56,7 @@ public class PipeObjectData : ScriptableObject
     public int Weight = 1;
 
     [Tooltip(
-        "Throw range and launch speed multiplier. 1 = default."
+        "Flight speed only (shorter flight). Does not change which slot the batter selects."
     )]
     public float LaunchAccelModifier = 1f;
 
@@ -68,6 +68,7 @@ public class PipeObjectData : ScriptableObject
         DefaultInteraction =
             PipeInteractionKind.Reject;
 
+    [Tooltip("Used by legacy helpers only; batter aim ignores this.")]
     public float ThrowPower =>
         LaunchAccelModifier
         / Mathf.Max(1, Weight);
