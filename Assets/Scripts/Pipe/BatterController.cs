@@ -19,20 +19,33 @@ public class BatterController : MonoBehaviour
     [SerializeField] private float _maxTargetHorizontalDistance = 1.25f;
 
     [Header("Slingshot")]
-    [SerializeField] private float _belowAxisThreshold = 0.05f;
     [SerializeField] private Transform _stickPivot;
     [SerializeField] private bool _logLaunchFailures = true;
 
-    [Header("Strike zone")]
+    [Header("Input zones (relative to axis Y)")]
     [Tooltip(
-        "Radius around the batter. Inside: no movement, strike aim starts here. "
-        + "Outside: move along the rail; release below the rail to hit."
+        "How far BELOW the rail the pointer can be and still count as movement. "
+        + "Pointer above the rail is always movement."
     )]
     [Min(0f)]
-    [SerializeField] private float _movementDeadZoneRadius = 1.2f;
+    [SerializeField] private float _movementZoneDepthBelowAxis = 0.3f;
+
+    [Tooltip(
+        "How far BELOW the rail the pointer must reach to switch into strike-aim mode."
+    )]
+    [Min(0f)]
+    [SerializeField] private float _strikeZoneDepthBelowAxis = 0.6f;
+
+    private enum DragMode
+    {
+        None,
+        Move,
+        Strike,
+    }
 
     private Vector2 _velocity;
     private bool _dragging;
+    private DragMode _mode;
     private Collider2D _collider;
 
     public BatterMovementAxis Axis => _axis;
@@ -134,35 +147,58 @@ public class BatterController : MonoBehaviour
 
     private void TryBeginDrag(Vector2 worldPos)
     {
-        if (!IsPointerOnBatter(worldPos))
-            return;
+        DragMode zoneMode = GetZoneMode(worldPos);
 
+        if (zoneMode == DragMode.Strike)
+        {
+            BeginDrag(DragMode.Strike);
+            return;
+        }
+
+        if (zoneMode == DragMode.Move && IsPointerOnBatter(worldPos))
+        {
+            BeginDrag(DragMode.Move);
+            return;
+        }
+    }
+
+    private void BeginDrag(DragMode mode)
+    {
         _dragging = true;
+        _mode = mode;
         _velocity = Vector2.zero;
     }
 
     private void UpdateDrag(Vector2 worldPos)
     {
-        if (IsInsideMovementDeadZone(worldPos))
-            BrakeMovement();
-        else
+        DragMode zoneMode = GetZoneMode(worldPos);
+        if (zoneMode != DragMode.None)
+            _mode = zoneMode;
+
+        if (_mode == DragMode.Move)
         {
             DriveAlongAxis(worldPos);
-        }
-
-        bool below = _axis.IsBelowAxis(worldPos, _belowAxisThreshold);
-        PipeObject target = GetObjectAbove();
-
-        if (below && target != null)
-        {
-            Vector2 pull = (Vector2)target.transform.position - worldPos;
-            _throwSystem.PreviewLaunch(target, pull);
-            AimStick(pull);
-        }
-        else
-        {
             _throwSystem.HidePreview();
             AimStick(_axis.Tangent);
+            return;
+        }
+
+        if (_mode == DragMode.Strike)
+        {
+            BrakeMovement();
+
+            PipeObject target = GetObjectAbove();
+            if (target != null)
+            {
+                Vector2 pull = (Vector2)target.transform.position - worldPos;
+                _throwSystem.PreviewLaunch(target, pull);
+                AimStick(pull);
+            }
+            else
+            {
+                _throwSystem.HidePreview();
+                AimStick(_axis.Tangent);
+            }
         }
     }
 
@@ -170,17 +206,19 @@ public class BatterController : MonoBehaviour
     {
         _throwSystem.HidePreview();
 
-        bool below = _axis.IsBelowAxis(worldPos, _belowAxisThreshold);
+        DragMode zoneMode = GetZoneMode(worldPos);
+        if (zoneMode != DragMode.None)
+            _mode = zoneMode;
 
-        if (below)
+        if (_mode == DragMode.Strike)
             TrySlingshotLaunch(worldPos);
-        else if (_logLaunchFailures && !below)
+        else if (_logLaunchFailures && _mode == DragMode.Move)
             Debug.Log(
-                "[Batter] Released on or above the movement line — "
-                + "release below the rail to strike."
+                "[Batter] Drag ended in movement zone — no strike."
             );
 
         _dragging = false;
+        _mode = DragMode.None;
     }
 
     private void EndDrag()
@@ -190,6 +228,20 @@ public class BatterController : MonoBehaviour
 
         _throwSystem.HidePreview();
         _dragging = false;
+        _mode = DragMode.None;
+    }
+
+    private DragMode GetZoneMode(Vector2 worldPos)
+    {
+        float depth = _axis.SignedDistanceBelow(worldPos);
+
+        if (depth >= _strikeZoneDepthBelowAxis)
+            return DragMode.Strike;
+
+        if (depth <= _movementZoneDepthBelowAxis)
+            return DragMode.Move;
+
+        return DragMode.None;
     }
 
     private void TrySlingshotLaunch(Vector2 worldPos)
@@ -215,11 +267,6 @@ public class BatterController : MonoBehaviour
             _logLaunchFailures
         );
     }
-
-    private bool IsInsideMovementDeadZone(Vector2 worldPos) =>
-        _movementDeadZoneRadius > 0f
-        && Vector2.Distance(worldPos, transform.position)
-            <= _movementDeadZoneRadius;
 
     private void BrakeMovement()
     {
@@ -296,10 +343,21 @@ public class BatterController : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        if (_movementDeadZoneRadius <= 0f)
+        if (_axis == null)
             return;
 
-        Gizmos.color = new Color(1f, 0.55f, 0.1f, 0.35f);
-        Gizmos.DrawWireSphere(transform.position, _movementDeadZoneRadius);
+        Vector2 onAxis = _axis.ClosestPointOnAxis(transform.position);
+        Vector2 tangent = _axis.Tangent;
+        Vector2 halfRail = tangent * (_axis.Length * 0.5f);
+
+        Vector2 moveStart = onAxis - halfRail - Vector2.up * _movementZoneDepthBelowAxis;
+        Vector2 moveEnd = onAxis + halfRail - Vector2.up * _movementZoneDepthBelowAxis;
+        Gizmos.color = new Color(0.2f, 0.9f, 1f, 0.8f);
+        Gizmos.DrawLine(moveStart, moveEnd);
+
+        Vector2 strikeStart = onAxis - halfRail - Vector2.up * _strikeZoneDepthBelowAxis;
+        Vector2 strikeEnd = onAxis + halfRail - Vector2.up * _strikeZoneDepthBelowAxis;
+        Gizmos.color = new Color(1f, 0.4f, 0.1f, 0.8f);
+        Gizmos.DrawLine(strikeStart, strikeEnd);
     }
 }
