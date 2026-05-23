@@ -1,0 +1,41 @@
+---
+description: duck_test Unity game — levels, inspector, pipeline conventions
+alwaysApply: true
+---
+
+# duck_test
+
+Unity **6000.4.1f1**. Repo root is `duck_test/`, not only `Assets/`.
+
+## Core loop
+
+Pipeline moves `PipeObject` through slots. Slot 0 → `InspectorController` (blocks tick until done). Spawner uses **explicit queue** from `LevelConfig.SpawnQueue`.
+
+## Duckiness (0–3)
+
+On `PipeObjectData.BaseDuckiness`. Inspector auto-decides Approve/Reject (player does not choose). Approve goals count only at **3/3**. Anger 0–6; rage at 6; lose after 3 rage modes. Tier 2: approve only 3/3.
+
+## Level system
+
+- **Data:** `LevelConfig` + `LevelDatabase` assets in `Assets/Data/Levels/`
+- **Runtime:** `LevelSession`, `LevelManager`, `InspectorController`
+- **Goals:** `ApproveObject`, `ApproveArchetype`, `MergePair`, `MergeToResult`
+- **Win:** all goals OR pipeline drained. **Fail:** 3 rage modes.
+
+## File locations
+
+- `InspectorAngerState` → end of `InspectorController.cs`
+- `LevelResultsSnapshot` → `GoalType.cs`
+- Merge hook → `PipelineInteractionResolver.MergeObjects`
+
+## Unity / Git rules
+
+- Commit every new/changed file **with its `.meta`**. GUID = exactly 32 lowercase hex.
+- Never commit `Library/`, `UserSettings/`, `Temp/`.
+- After adding `.cs`, verify it appears in generated `Assembly-CSharp.csproj`.
+- Prefer extending existing imported scripts over new orphan `.cs` files.
+- Minimize scope; match existing C# style (SerializeField, no over-abstraction).
+
+## New level workflow
+
+Duplicate `Level_01.asset` → edit Spawn Queue + Goals → add to `Campaign.asset`.
