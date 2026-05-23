@@ -1,29 +1,30 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class PipelineController : MonoBehaviour
+public class PipelineController : MonoBehaviour, IPipelineControl
 {
     [SerializeField] private List<PipeSlot> _slots = new();
     public float MoveInterval = 1.5f;
-    public bool IsPaused;
+    public bool IsPaused { get; set; }
     [SerializeField] private GameStateManager _gameState;
     private Coroutine _tickRoutine;
     [SerializeField] private PipelineSpawner _spawner;
     [SerializeField] private float _homerunBeyondSpacing = 1f;
+
+    private InspectorController _inspector;
+    private bool _stopped = true;
+
     public IReadOnlyList<PipeSlot> Slots => _slots;
     public PipelineInteractionResolver InteractionResolver;
+
+    public event Action OnPipelineDrained;
 
     private void Awake()
     {
         for (int i = 0; i < _slots.Count; i++)
             _slots[i].Index = i;
-    }
-
-    private void Start()
-    {
-        MoveOcupasToNewSlot();
     }
 
     private void OnEnable()
@@ -33,7 +34,63 @@ public class PipelineController : MonoBehaviour
 
     private void OnDisable()
     {
-        if (_tickRoutine != null) StopCoroutine(_tickRoutine);
+        if (_tickRoutine != null)
+            StopCoroutine(_tickRoutine);
+    }
+
+    public void ResetForLevel(
+        LevelConfig config,
+        InspectorController inspector,
+        PipelineSpawner spawner
+    )
+    {
+        _inspector = inspector;
+        _spawner = spawner;
+        _stopped = false;
+        IsPaused = false;
+
+        if (config != null)
+            MoveInterval = config.MoveInterval;
+
+        ClearAllSlots();
+        MoveOcupasToNewSlot();
+    }
+
+    public void StopPipeline()
+    {
+        _stopped = true;
+        IsPaused = true;
+    }
+
+    public bool AllSlotsEmpty
+    {
+        get
+        {
+            if (_slots == null)
+                return true;
+
+            foreach (PipeSlot slot in _slots)
+            {
+                if (slot.OccupiedObject != null)
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
+    private void ClearAllSlots()
+    {
+        if (_slots == null)
+            return;
+
+        foreach (PipeSlot slot in _slots)
+        {
+            if (slot.OccupiedObject != null)
+                Destroy(slot.OccupiedObject.gameObject);
+
+            slot.ClearOccupant();
+        }
     }
 
     private IEnumerator PipelineTickRoutine()
@@ -47,50 +104,89 @@ public class PipelineController : MonoBehaviour
 
     public void TickPipeline()
     {
+        if (_stopped)
+            return;
+
         if (IsPaused)
             return;
-        if (_gameState != null && _gameState.Current != PipeGameState.Playing)
+
+        if (_inspector != null && _inspector.IsBusy)
             return;
+
+        if (_gameState != null
+            && _gameState.Current != PipeGameState.Playing)
+            return;
+
         if (_slots == null || _slots.Count == 0)
             return;
 
         PipeObject removed = _slots[0].OccupiedObject;
 
-        if (removed != null)
-        {
-            Destroy(removed.gameObject); // TODO probably some animation from object should be called
-        }
-
-        // TODO shifted array have no sense, do in one cycle
         List<PipeObject> shifted = new();
 
         for (int i = 1; i < _slots.Count; i++)
-        {
             shifted.Add(_slots[i].OccupiedObject);
-        }
 
         shifted.Add(null);
 
         for (int i = 0; i < _slots.Count; i++)
-        {
             _slots[i].SetOccupant(shifted[i]);
+
+        _slots[^1].ClearOccupant();
+
+        if (removed != null)
+        {
+            if (_inspector != null)
+            {
+                _inspector.BeginInspection(
+                    removed,
+                    CompleteTickAfterInspection
+                );
+                return;
+            }
+
+            Destroy(removed.gameObject);
         }
-        ////
 
-        _slots[^1].ClearOccupant(); // last obj
-
-        _spawner.SpawnRandom();
-
-        MoveOcupasToNewSlot();
+        CompleteTick();
     }
 
-    public void MoveOcupasToNewSlot() // TODO this probably should be combined with array above
+    private void CompleteTickAfterInspection() => CompleteTick();
+
+    private void CompleteTick()
+    {
+        if (_stopped)
+            return;
+
+        if (_spawner != null)
+            _spawner.SpawnNext();
+
+        MoveOcupasToNewSlot();
+        TryNotifyPipelineDrained();
+    }
+
+    private void TryNotifyPipelineDrained()
+    {
+        if (_spawner == null || !_spawner.QueueFinished)
+            return;
+
+        if (!AllSlotsEmpty)
+            return;
+
+        if (_inspector != null && _inspector.IsBusy)
+            return;
+
+        OnPipelineDrained?.Invoke();
+    }
+
+    public void MoveOcupasToNewSlot()
     {
         foreach (PipeSlot slot in _slots)
         {
             PipeObject obj = slot.OccupiedObject;
             if (obj == null)
                 continue;
+
             obj.CurrentSlot = slot;
             obj.MoveTo(slot.transform.position);
         }
@@ -128,10 +224,6 @@ public class PipelineController : MonoBehaviour
         return segments > 0 ? total / segments : 1f;
     }
 
-    /// <summary>
-    /// World points just outside the first / last slot along the pipeline.
-    /// Left = beyond slot 0, Right = beyond the last slot.
-    /// </summary>
     public bool TryGetHomerunLandingPoints(
         out Vector2 leftBeyond,
         out Vector2 rightBeyond
@@ -162,7 +254,6 @@ public class PipelineController : MonoBehaviour
         return _slots.Count - 1 - obj.CurrentSlot.Index;
     }
 
-    /// <summary>Slots toward index 0 (front / eject end).</summary>
     public int GetMaxForwardSlots(PipeObject obj)
     {
         if (obj?.CurrentSlot == null || _slots == null)
@@ -182,7 +273,6 @@ public class PipelineController : MonoBehaviour
         );
     }
 
-    /// <param name="signedOffset">Negative = toward slot 0, positive = toward last slot.</param>
     public PipeSlot GetSlotAtOffset(
         PipeObject obj,
         int signedOffset
@@ -201,9 +291,6 @@ public class PipelineController : MonoBehaviour
         return _slots[targetIndex];
     }
 
-    /// <summary>
-    /// Closest occupied pipe object by world X (batter is not slot-aligned).
-    /// </summary>
     public PipeObject GetOccupantNearWorldX(
         float worldX,
         float maxHorizontalDistance

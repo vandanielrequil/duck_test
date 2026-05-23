@@ -6,6 +6,9 @@ public class PipeObject : MonoBehaviour
     public PipeSlot CurrentSlot;
     public PipeObject hardcodedMerge;
 
+    public int Duckiness =>
+        Data != null ? Data.BaseDuckiness : 0;
+
     [SerializeField] private float _followSpeed = 8f;
 
     private Vector2 _targetPosition;
@@ -78,7 +81,7 @@ public class PipeObject : MonoBehaviour
     {
     }
 
-    public void MergeWith(PipeObject other)
+    public PipeObject MergeWith(PipeObject other)
     {
         PipeSlot slot = CurrentSlot;
         Vector3 spawnPos = transform.position;
@@ -93,8 +96,9 @@ public class PipeObject : MonoBehaviour
         {
             Debug.LogError("Hardcoded merge is not set");
             Destroy(gameObject);
-            Destroy(other.gameObject);
-            return;
+            if (other != null)
+                Destroy(other.gameObject);
+            return null;
         }
 
         PipeObject merged = Instantiate(
@@ -113,5 +117,6 @@ public class PipeObject : MonoBehaviour
             Destroy(other.gameObject);
 
         Destroy(gameObject);
+        return merged;
     }
 }

@@ -1,0 +1,141 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LevelManager : MonoBehaviour
+{
+    private readonly List<LevelGoalRuntime> _goals = new();
+
+    private LevelConfig _config;
+    private int _objectsApproved;
+
+    public LevelConfig CurrentConfig => _config;
+    public IReadOnlyList<LevelGoalRuntime> Goals => _goals;
+    public int ObjectsApproved => _objectsApproved;
+
+    public event Action<LevelGoalRuntime> OnGoalProgress;
+    public event Action OnAllGoalsComplete;
+
+    public void Load(LevelConfig config)
+    {
+        _config = config;
+        _objectsApproved = 0;
+        _goals.Clear();
+
+        if (config?.Goals == null)
+            return;
+
+        foreach (LevelGoalData goal in config.Goals)
+            _goals.Add(new LevelGoalRuntime(goal));
+    }
+
+    public bool AllGoalsComplete
+    {
+        get
+        {
+            if (_goals.Count == 0)
+                return false;
+
+            foreach (LevelGoalRuntime goal in _goals)
+            {
+                if (!goal.IsComplete)
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
+    public void ReportInspection(
+        PipeObject obj,
+        InspectionOutcome outcome,
+        int duckiness
+    )
+    {
+        if (_config == null || obj == null)
+            return;
+
+        if (outcome != InspectionOutcome.Approve)
+            return;
+
+        _objectsApproved++;
+
+        foreach (LevelGoalRuntime goal in _goals)
+        {
+            if (goal.IsComplete)
+                continue;
+
+            if (!goal.MatchesApprove(obj, duckiness))
+                continue;
+
+            goal.AddProgress();
+            OnGoalProgress?.Invoke(goal);
+        }
+
+        if (AllGoalsComplete)
+            OnAllGoalsComplete?.Invoke();
+    }
+
+    public void ReportMergePair(
+        PipeObjectData inputA,
+        PipeObjectData inputB,
+        PipeObjectData result
+    )
+    {
+        if (_config == null)
+            return;
+
+        foreach (LevelGoalRuntime goal in _goals)
+        {
+            if (goal.IsComplete)
+                continue;
+
+            if (goal.MatchesMergePair(inputA, inputB))
+            {
+                goal.AddProgress();
+                OnGoalProgress?.Invoke(goal);
+            }
+            else if (goal.MatchesMergeResult(result))
+            {
+                goal.AddProgress();
+                OnGoalProgress?.Invoke(goal);
+            }
+        }
+
+        if (AllGoalsComplete)
+            OnAllGoalsComplete?.Invoke();
+    }
+
+    public LevelResultsSnapshot BuildResultsSnapshot(
+        LevelEndOutcome outcome,
+        LevelEndReason reason,
+        int rageModesTriggered
+    )
+    {
+        var lines = new LevelGoalResultLine[_goals.Count];
+
+        for (int i = 0; i < _goals.Count; i++)
+        {
+            LevelGoalRuntime goal = _goals[i];
+            lines[i] = new LevelGoalResultLine
+            {
+                Description = goal.GetDisplayDescription(),
+                Current = goal.Current,
+                Required = goal.Config.RequiredAmount,
+                Complete = goal.IsComplete,
+            };
+        }
+
+        return new LevelResultsSnapshot
+        {
+            LevelName = _config != null
+                ? _config.DisplayName
+                : string.Empty,
+            Outcome = outcome,
+            Reason = reason,
+            GoalLines = lines,
+            RageModesTriggered = rageModesTriggered,
+            ObjectsApproved = _objectsApproved,
+        };
+    }
+}

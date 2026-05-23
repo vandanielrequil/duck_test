@@ -53,6 +53,9 @@ public class PipeObjectData : ScriptableObject
     public GameObject SpawnPrefab;
 
     [Header("Gameplay")]
+    [Range(0, 3)]
+    public int BaseDuckiness;
+
     public int Weight = 1;
 
     [Tooltip(
@@ -72,4 +75,16 @@ public class PipeObjectData : ScriptableObject
     public float ThrowPower =>
         LaunchAccelModifier
         / Mathf.Max(1, Weight);
+
+    private void OnValidate()
+    {
+        if (BaseDuckiness > 0)
+            return;
+
+        BaseDuckiness = Archetype switch
+        {
+            PipeArchetype.Duck => 3,
+            _ => 0,
+        };
+    }
 }

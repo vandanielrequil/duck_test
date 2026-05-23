@@ -6,6 +6,9 @@ public enum PipeGameState
     Inspecting,
     GameOver,
     Paused,
+    LevelWon,
+    LevelLost,
+    CampaignComplete,
 }
 
 public class GameStateManager : MonoBehaviour

@@ -16,7 +16,8 @@ MonoBehaviour:
   Archetype: 0
   Tags: 0
   DisplaySprite: {fileID: 0}
-  SpawnPrefab: {fileID: 0}
+  SpawnPrefab: {fileID: 2638229728488114212, guid: 5f8781d8e0a76ad4fa139cc9b56547af, type: 3}
+  BaseDuckiness: 3
   Weight: 2
   CanBeMerged: 1
   CanBeShoved: 1

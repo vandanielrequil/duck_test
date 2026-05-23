@@ -16,7 +16,8 @@ MonoBehaviour:
   Archetype: 2
   Tags: 32
   DisplaySprite: {fileID: 0}
-  SpawnPrefab: {fileID: 0}
+  SpawnPrefab: {fileID: 2638229728488114212, guid: e7261960bd8c43b4299819c7e09eb87e, type: 3}
+  BaseDuckiness: 0
   Weight: 3
   LaunchAccelModifier: 1
   CanBeMerged: 1
