@@ -19,14 +19,14 @@ On `PipeObjectData.BaseDuckiness`. Inspector auto-decides Approve/Reject (player
 
 - **Data:** `LevelConfig` + `LevelDatabase` assets in `Assets/Data/Levels/`
 - **Runtime:** `LevelSession`, `LevelManager`, `InspectorController`
-- **Goals:** `ApproveObject`, `ApproveArchetype`, `MergePair`, `MergeToResult`
+- **Goals:** `ApproveObject`, `ApproveArchetype`, `MergePair`, `MergeToResult` — **все** засчитывает только инспектор при проверке (`ReportInspection`), не факт merge/approve в пайплайне
 - **Win:** all goals OR pipeline drained. **Fail:** 3 rage modes.
 
 ## File locations
 
 - `InspectorAngerState` → end of `InspectorController.cs`
 - `LevelResultsSnapshot` → `GoalType.cs`
-- Merge hook → `PipelineInteractionResolver.MergeObjects`
+- Merge inputs on inspected object → `PipeObject.MergeInputA/B` (set in `PipeObject.MergeWith`)
 
 ## Unity / Git rules
 

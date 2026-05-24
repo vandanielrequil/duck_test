@@ -3,6 +3,8 @@ using UnityEngine;
 public class PipeObject : MonoBehaviour
 {
     public PipeObjectData Data;
+    public PipeObjectData MergeInputA;
+    public PipeObjectData MergeInputB;
     public PipeSlot CurrentSlot;
     public PipeObject hardcodedMerge;
 
@@ -106,6 +108,9 @@ public class PipeObject : MonoBehaviour
             spawnPos,
             Quaternion.identity
         );
+
+        merged.MergeInputA = Data;
+        merged.MergeInputB = other?.Data;
 
         if (slot != null)
         {

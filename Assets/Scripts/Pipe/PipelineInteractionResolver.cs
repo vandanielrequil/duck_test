@@ -4,15 +4,11 @@ using UnityEngine;
 public class PipelineInteractionResolver : MonoBehaviour
 {
     [SerializeField] private PipelineController _pipeline;
-    [SerializeField] private LevelManager _levelManager;
 
     private void Awake()
     {
         if (_pipeline == null)
             _pipeline = FindAnyObjectByType<PipelineController>();
-
-        if (_levelManager == null)
-            _levelManager = FindAnyObjectByType<LevelManager>();
     }
 
     public InteractionResult ResolveInteraction(
@@ -212,20 +208,12 @@ public class PipelineInteractionResolver : MonoBehaviour
         obj.MoveTo(slot.transform.position);
     }
 
-    private void MergeObjects(
+    private static void MergeObjects(
         PipeObject moving,
         PipeObject target
     )
     {
-        PipeObjectData inputA = moving?.Data;
-        PipeObjectData inputB = target?.Data;
-        PipeObject merged = target.MergeWith(moving);
-
-        _levelManager?.ReportMergePair(
-            inputA,
-            inputB,
-            merged?.Data
-        );
+        target.MergeWith(moving);
     }
 
     private void ShoveObject(PipeObject target)

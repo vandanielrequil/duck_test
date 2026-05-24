@@ -8,7 +8,7 @@ public class LevelGoalRuntime
 
     public bool IsComplete => Current >= Config.RequiredAmount;
 
-    public float Normalized =>
+    public float ProgressRatio =>
         Config.RequiredAmount > 0
             ? (float)Current / Config.RequiredAmount
             : 1f;

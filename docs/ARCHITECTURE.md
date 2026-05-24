@@ -83,10 +83,10 @@
 |-----|---------------------|
 | `ApproveObject` | Approve 3/3 + `PipeObjectData` совпал |
 | `ApproveArchetype` | Approve 3/3 + archetype/tags |
-| `MergePair` | Merge `MergeInputA` + `MergeInputB` (порядок не важен) |
-| `MergeToResult` | Merge дал `MergeResult` |
+| `MergePair` | Инспектор проверил объект, сложенный из `MergeInputA` + `MergeInputB` |
+| `MergeToResult` | Инспектор проверил объект с `Data == MergeResult` |
 
-Хук merge: `PipelineInteractionResolver.MergeObjects` → `LevelManager.ReportMergePair`.
+**Все цели** засчитывает только инспектор (`InspectorController` → `LevelManager.ReportInspection`). Merge в пайплайне лишь создаёт объект; входы merge хранятся на `PipeObject.MergeInputA/B`.
 
 ### Завершение уровня
 

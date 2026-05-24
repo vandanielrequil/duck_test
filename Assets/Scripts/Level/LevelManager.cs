@@ -55,6 +55,8 @@ public class LevelManager : MonoBehaviour
         if (_config == null || obj == null)
             return;
 
+        ReportMergeGoals(obj);
+
         if (outcome != InspectionOutcome.Approve)
             return;
 
@@ -76,33 +78,30 @@ public class LevelManager : MonoBehaviour
             OnAllGoalsComplete?.Invoke();
     }
 
-    public void ReportMergePair(
-        PipeObjectData inputA,
-        PipeObjectData inputB,
-        PipeObjectData result
-    )
+    private void ReportMergeGoals(PipeObject obj)
     {
-        if (_config == null)
-            return;
+        bool progress = false;
 
         foreach (LevelGoalRuntime goal in _goals)
         {
             if (goal.IsComplete)
                 continue;
 
-            if (goal.MatchesMergePair(inputA, inputB))
+            if (goal.MatchesMergePair(obj.MergeInputA, obj.MergeInputB))
             {
                 goal.AddProgress();
                 OnGoalProgress?.Invoke(goal);
+                progress = true;
             }
-            else if (goal.MatchesMergeResult(result))
+            else if (goal.MatchesMergeResult(obj.Data))
             {
                 goal.AddProgress();
                 OnGoalProgress?.Invoke(goal);
+                progress = true;
             }
         }
 
-        if (AllGoalsComplete)
+        if (progress && AllGoalsComplete)
             OnAllGoalsComplete?.Invoke();
     }
 
