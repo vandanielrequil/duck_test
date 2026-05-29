@@ -250,7 +250,6 @@ MonoBehaviour:
   - {fileID: 729423424}
   - {fileID: 141366045}
   MoveInterval: 1.5
-  IsPaused: 0
   _gameState: {fileID: 990001003}
   _spawner: {fileID: 1560194825}
   _homerunBeyondSpacing: 1
@@ -1180,7 +1179,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 159366670}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &756578584
+--- !u!1 &990001001
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1188,89 +1187,94 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 756578586}
-  - component: {fileID: 756578585}
+  - component: {fileID: 990001002}
+  - component: {fileID: 990001003}
+  - component: {fileID: 990001004}
+  - component: {fileID: 990001005}
+  - component: {fileID: 990001006}
   m_Layer: 0
-  m_Name: Circle
+  m_Name: LevelSystems
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!212 &756578585
-SpriteRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 756578584}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
---- !u!4 &756578586
+  m_IsActive: 1
+--- !u!4 &990001002
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 756578584}
+  m_GameObject: {fileID: 990001001}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.003062993, w: 0.9999953}
-  m_LocalPosition: {x: -0.26, y: -0.98, z: 0}
-  m_LocalScale: {x: 11.4319, y: 0.23705396, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.351}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &990001003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990001001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c74398b5601da2ef08dbaef3476159c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameStateManager
+  _state: 0
+--- !u!114 &990001004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990001001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef0123456789abcd123456789abcdef0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelManager
+--- !u!114 &990001005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990001001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0123456789abcde23456789abcdef01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InspectorController
+  _pipeline: {fileID: 159366669}
+  _gameState: {fileID: 990001003}
+  _levelManager: {fileID: 990001004}
+--- !u!114 &990001006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990001001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: def0123456789abc0123456789abcdef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSession
+  _database: {fileID: 11400000, guid: 55556666777788889999000011112222, type: 2}
+  _levelManager: {fileID: 990001004}
+  _inspector: {fileID: 990001005}
+  _pipeline: {fileID: 159366669}
+  _spawner: {fileID: 1560194825}
+  _gameState: {fileID: 990001003}
+  _resultsScreen: {fileID: 0}
+  _ignoreSaveForTesting: 1
+  _debugStartLevelIndex: 0
 --- !u!1 &1097418565
 GameObject:
   m_ObjectHideFlags: 0
@@ -1454,10 +1458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PipelineSpawner
   _pipeline: {fileID: 159366669}
-  _prefabs:
-  - {fileID: 2638229728488114212, guid: 5f8781d8e0a76ad4fa139cc9b56547af, type: 3}
-  - {fileID: 4669166160011835537, guid: ce457221e537c1149ac774bc2c72e696, type: 3}
-  - {fileID: 4156314351588208180, guid: e7261960bd8c43b4299819c7e09eb87e, type: 3}
+  _objectPrefab: {fileID: 4669166160011835537, guid: ce457221e537c1149ac774bc2c72e696, type: 3}
   _spawnOffset: 2
 --- !u!4 &1560194826
 Transform:
@@ -1622,9 +1623,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1825136866}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25ff999f7083e614dac41a6088c20e2a, type: 3}
+  m_Script: {fileID: 11500000, guid: f0123456789abcde23456789abcdef01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DuckInspector
+  _pipeline: {fileID: 159366669}
+  _gameState: {fileID: 990001003}
+  _levelManager: {fileID: 990001004}
 --- !u!1 &1934730752
 GameObject:
   m_ObjectHideFlags: 0
@@ -1727,101 +1731,4 @@ SceneRoots:
   - {fileID: 159366670}
   - {fileID: 493863375}
   - {fileID: 9504424}
-  - {fileID: 756578586}
   - {fileID: 990001002}
---- !u!1 &990001001
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 990001002}
-  - component: {fileID: 990001003}
-  - component: {fileID: 990001004}
-  - component: {fileID: 990001005}
-  - component: {fileID: 990001006}
-  m_Layer: 0
-  m_Name: LevelSystems
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &990001002
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 990001001}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &990001003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 990001001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c74398b5601da2ef08dbaef3476159c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameStateManager
-  _state: 0
---- !u!114 &990001004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 990001001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef0123456789abcd123456789abcdef0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelManager
---- !u!114 &990001005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 990001001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0123456789abcde23456789abcdef01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InspectorController
-  _pipeline: {fileID: 159366669}
-  _gameState: {fileID: 990001003}
-  _levelManager: {fileID: 990001004}
---- !u!114 &990001006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 990001001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: def0123456789abc0123456789abcdef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelSession
-  _database: {fileID: 11400000, guid: 55556666777788889999000011112222, type: 2}
-  _levelManager: {fileID: 990001004}
-  _inspector: {fileID: 990001005}
-  _pipeline: {fileID: 159366669}
-  _spawner: {fileID: 1560194825}
-  _gameState: {fileID: 990001003}
-  _resultsScreen: {fileID: 0}
-  _ignoreSaveForTesting: 1
-  _debugStartLevelIndex: 0

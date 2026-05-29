@@ -10,16 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29a7b1e6d80cf453194cad0352efb678, type: 3}
-  m_Name: DuckificatorData
+  m_Name: DuckData
   m_EditorClassIdentifier: Assembly-CSharp::PipeObjectData
-  ObjectId: duckificator
-  Archetype: 2
+  ObjectId: 
+  Archetype: 0
   Tags: 0
-  DisplaySprite: {fileID: 0}
-  SpawnPrefab: {fileID: 4156314351588208180, guid: 6b7fd8b7ec8585a4a902cd47b869f232, type: 3}
-  BaseDuckiness: 0
-  Weight: 1
+  DisplayVisualPrefab: {fileID: 8701965896545333271, guid: 36793bfc31b930643835a6aafeaf327a, type: 3}
+  FakeVisualPrefab: {fileID: 0}
+  FakePaintVisualPrefab: {fileID: 0}
+  FakeKitVisualPrefab: {fileID: 0}
+  FakePaintKitVisualPrefab: {fileID: 0}
+  BaseDuckiness: 3
+  ModifierType: 0
+  FollowSpeed: 8
+  Weight: 2
   LaunchAccelModifier: 1
   CanBeMerged: 1
   CanBeShoved: 1
-  DefaultInteraction: 1
+  DefaultInteraction: 3

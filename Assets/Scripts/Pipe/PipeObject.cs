@@ -2,25 +2,69 @@ using UnityEngine;
 
 public class PipeObject : MonoBehaviour
 {
-    public PipeObjectData Data;
-    public PipeObjectData MergeInputA;
-    public PipeObjectData MergeInputB;
+    public PipeObjectState State { get; private set; }
     public PipeSlot CurrentSlot;
-    public PipeObject hardcodedMerge;
 
     public int Duckiness =>
-        Data != null ? Data.BaseDuckiness : 0;
+        State != null ? State.Duckiness : 0;
 
-    [SerializeField] private float _followSpeed = 8f;
-
+    private const float FallbackFollowSpeed = 8f;
     private Vector2 _targetPosition;
     private float _visualZ;
     private bool _followEnabled = true;
+    private SpriteRenderer _spriteRenderer;
+    private GameObject _visualInstance;
 
     private void Awake()
     {
         _visualZ = transform.position.z;
         _targetPosition = transform.position;
+        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+    }
+
+    public void Initialize(
+        PipeObjectData data
+    )
+    {
+        State = new PipeObjectState(data);
+
+        ApplyVisual();
+    }
+
+    public void Initialize(PipeObjectState state)
+    {
+        State = state;
+        ApplyVisual();
+    }
+
+    private void ApplyVisual()
+    {
+        if (_visualInstance != null)
+            Destroy(_visualInstance);
+
+        if (_spriteRenderer == null)
+            _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        GameObject visualPrefab = State?.GetVisualPrefab();
+
+        if (visualPrefab == null)
+        {
+            if (_spriteRenderer != null)
+                _spriteRenderer.enabled = true;
+
+            return;
+        }
+
+        if (_spriteRenderer != null)
+            _spriteRenderer.enabled = false;
+
+        _visualInstance = Instantiate(
+            visualPrefab,
+            transform
+        );
+        _visualInstance.transform.localPosition = Vector3.zero;
+        _visualInstance.transform.localRotation = Quaternion.identity;
+        _visualInstance.transform.localScale = Vector3.one;
     }
 
     public void MoveTo(Vector3 targetWorldPosition)
@@ -71,9 +115,14 @@ public class PipeObject : MonoBehaviour
         transform.position = Vector3.Lerp(
             transform.position,
             _targetPosition,
-            _followSpeed * Time.deltaTime
+            GetFollowSpeed() * Time.deltaTime
         );
     }
+
+    private float GetFollowSpeed() =>
+        State?.ObjectData != null
+            ? Mathf.Max(0f, State.ObjectData.FollowSpeed)
+            : FallbackFollowSpeed;
 
     public void OnInspect()
     {
@@ -83,45 +132,144 @@ public class PipeObject : MonoBehaviour
     {
     }
 
-    public PipeObject MergeWith(PipeObject other)
+    public bool TryApplyModifier(
+        PipeObject modifier,
+        out PipeObjectData inputA,
+        out PipeObjectData inputB
+    )
     {
-        PipeSlot slot = CurrentSlot;
-        Vector3 spawnPos = transform.position;
+        inputA = State?.ObjectData;
+        inputB = modifier?.State?.ObjectData;
 
-        if (slot != null)
-            slot.ClearOccupant();
+        if (State == null || modifier?.State?.ObjectData == null)
+            return false;
 
-        if (other != null && other.CurrentSlot != null)
-            other.CurrentSlot.ClearOccupant();
+        if (!State.TryAddModifier(
+                modifier.State.ObjectData.ModifierType,
+                inputA,
+                inputB,
+                out PipeObjectState next
+            ))
+            return false;
 
-        if (hardcodedMerge == null)
+        Initialize(next);
+        return true;
+    }
+}
+
+public class PipeObjectState
+{
+    public PipeObjectData ObjectData { get; }
+    public PipeObjectData MergeInputA { get; }
+    public PipeObjectData MergeInputB { get; }
+    public bool HasPaint { get; }
+    public bool HasKit { get; }
+
+    public int Duckiness
+    {
+        get
         {
-            Debug.LogError("Hardcoded merge is not set");
-            Destroy(gameObject);
-            if (other != null)
-                Destroy(other.gameObject);
-            return null;
+            if (ObjectData == null)
+                return 0;
+
+            if (ObjectData.Archetype != PipeArchetype.Fake)
+                return ObjectData.BaseDuckiness;
+
+            int modifiers = 0;
+            if (HasPaint) modifiers++;
+            if (HasKit) modifiers++;
+            return modifiers;
+        }
+    }
+
+    public PipeObjectState(PipeObjectData data)
+        : this(data, null, null, false, false)
+    {
+    }
+
+    private PipeObjectState(
+        PipeObjectData data,
+        PipeObjectData mergeInputA,
+        PipeObjectData mergeInputB,
+        bool hasPaint,
+        bool hasKit
+    )
+    {
+        ObjectData = data;
+        MergeInputA = mergeInputA;
+        MergeInputB = mergeInputB;
+        HasPaint = hasPaint;
+        HasKit = hasKit;
+    }
+
+    public bool TryAddModifier(
+        PipeModifierType modifier,
+        PipeObjectData inputA,
+        PipeObjectData inputB,
+        out PipeObjectState next
+    )
+    {
+        next = null;
+
+        if (ObjectData == null || ObjectData.Archetype != PipeArchetype.Fake)
+            return false;
+
+        bool hasPaint = HasPaint;
+        bool hasKit = HasKit;
+
+        switch (modifier)
+        {
+            case PipeModifierType.Paint:
+                if (hasPaint)
+                    return false;
+                hasPaint = true;
+                break;
+
+            case PipeModifierType.Kit:
+                if (hasKit)
+                    return false;
+                hasKit = true;
+                break;
+
+            default:
+                return false;
         }
 
-        PipeObject merged = Instantiate(
-            hardcodedMerge,
-            spawnPos,
-            Quaternion.identity
+        next = new PipeObjectState(
+            ObjectData,
+            inputA,
+            inputB,
+            hasPaint,
+            hasKit
         );
+        return true;
+    }
 
-        merged.MergeInputA = Data;
-        merged.MergeInputB = other?.Data;
+    public GameObject GetVisualPrefab()
+    {
+        if (ObjectData == null)
+            return null;
 
-        if (slot != null)
-        {
-            slot.SetOccupant(merged);
-            merged.MoveTo(slot.transform.position);
-        }
+        if (ObjectData.Archetype != PipeArchetype.Fake)
+            return ObjectData.DisplayVisualPrefab;
 
-        if (other != null)
-            Destroy(other.gameObject);
+        if (HasPaint && HasKit)
+            return ObjectData.FakePaintKitVisualPrefab != null
+                ? ObjectData.FakePaintKitVisualPrefab
+                : ObjectData.DisplayVisualPrefab;
 
-        Destroy(gameObject);
-        return merged;
+        if (HasPaint)
+            return ObjectData.FakePaintVisualPrefab != null
+                ? ObjectData.FakePaintVisualPrefab
+                : ObjectData.DisplayVisualPrefab;
+
+        if (HasKit)
+            return ObjectData.FakeKitVisualPrefab != null
+                ? ObjectData.FakeKitVisualPrefab
+                : ObjectData.DisplayVisualPrefab;
+
+        return ObjectData.FakeVisualPrefab != null
+            ? ObjectData.FakeVisualPrefab
+            : ObjectData.DisplayVisualPrefab;
     }
 }

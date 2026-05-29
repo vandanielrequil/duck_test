@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum PipeArchetype
 {
@@ -33,6 +34,13 @@ public enum PipeInteractionKind
     Eject,
 }
 
+public enum PipeModifierType
+{
+    None,
+    Paint,
+    Kit,
+}
+
 [CreateAssetMenu(
     fileName = "PipeObjectData",
     menuName = "Pipe/Pipe Object Data"
@@ -48,13 +56,27 @@ public class PipeObjectData : ScriptableObject
         PipeObjectTag.None;
 
     [Header("Visual")]
-    public Sprite DisplaySprite;
+    [FormerlySerializedAs("DisplaySprite")]
+    public GameObject DisplayVisualPrefab;
 
-    public GameObject SpawnPrefab;
+    [Header("Fake merge visuals")]
+    [FormerlySerializedAs("FakeSprite")]
+    public GameObject FakeVisualPrefab;
+    [FormerlySerializedAs("FakePaintSprite")]
+    public GameObject FakePaintVisualPrefab;
+    [FormerlySerializedAs("FakeKitSprite")]
+    public GameObject FakeKitVisualPrefab;
+    [FormerlySerializedAs("FakePaintKitSprite")]
+    public GameObject FakePaintKitVisualPrefab;
 
     [Header("Gameplay")]
     [Range(0, 3)]
     public int BaseDuckiness;
+
+    public PipeModifierType ModifierType =
+        PipeModifierType.None;
+
+    public float FollowSpeed = 8f;
 
     public int Weight = 1;
 

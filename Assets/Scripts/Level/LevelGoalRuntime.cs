@@ -31,7 +31,7 @@ public class LevelGoalRuntime
 
     public bool MatchesApprove(PipeObject obj, int duckiness)
     {
-        if (obj?.Data == null)
+        if (obj?.State?.ObjectData == null)
             return false;
 
         if (duckiness < Config.MinDuckiness)
@@ -41,15 +41,15 @@ public class LevelGoalRuntime
         {
             case GoalType.ApproveObject:
                 return Config.ApproveTarget != null
-                    && obj.Data == Config.ApproveTarget;
+                    && obj.State.ObjectData == Config.ApproveTarget;
 
             case GoalType.ApproveArchetype:
                 if (Config.TargetArchetype != default
-                    && obj.Data.Archetype != Config.TargetArchetype)
+                    && obj.State.ObjectData.Archetype != Config.TargetArchetype)
                     return false;
 
                 if (Config.RequiredTags != PipeObjectTag.None
-                    && (obj.Data.Tags & Config.RequiredTags)
+                    && (obj.State.ObjectData.Tags & Config.RequiredTags)
                         != Config.RequiredTags)
                     return false;
 

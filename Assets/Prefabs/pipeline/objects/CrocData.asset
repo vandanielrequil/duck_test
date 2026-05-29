@@ -15,9 +15,14 @@ MonoBehaviour:
   ObjectId: 
   Archetype: 1
   Tags: 0
-  DisplaySprite: {fileID: 0}
-  SpawnPrefab: {fileID: 2638229728488114212, guid: ce457221e537c1149ac774bc2c72e696, type: 3}
+  DisplaySprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  FakeSprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  FakePaintSprite: {fileID: 0}
+  FakeKitSprite: {fileID: 3625043607559282579, guid: 19fb86013d8c24d6cb8410c0aadf30fa, type: 3}
+  FakePaintKitSprite: {fileID: 0}
   BaseDuckiness: 0
+  ModifierType: 0
+  FollowSpeed: 8
   Weight: 10
   LaunchAccelModifier: 1
   CanBeMerged: 1

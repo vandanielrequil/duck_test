@@ -84,13 +84,14 @@ public class PipelineInteractionResolver : MonoBehaviour
         PipeObject target
     )
     {
-        if (moving.Data == null || target.Data == null)
+        if (moving.State?.ObjectData == null
+            || target.State?.ObjectData == null)
             return InteractionResult.Bounce;
 
-        PipeArchetype m = moving.Data.Archetype;
-        PipeArchetype t = target.Data.Archetype;
+        PipeArchetype m = moving.State.ObjectData.Archetype;
+        PipeArchetype t = target.State.ObjectData.Archetype;
 
-        if (IsMergePair(m, t))
+        if (CanMerge(moving, target))
             return InteractionResult.Merge;
 
         if (IsWeightBasedPair(m, t))
@@ -160,7 +161,7 @@ public class PipelineInteractionResolver : MonoBehaviour
     }
 
     private static int GetWeight(PipeObject obj) =>
-        Mathf.Max(1, obj?.Data?.Weight ?? 1);
+        Mathf.Max(1, obj?.State?.ObjectData?.Weight ?? 1);
 
     private bool HasEmptySlotBehind(PipeObject target)
     {
@@ -208,12 +209,97 @@ public class PipelineInteractionResolver : MonoBehaviour
         obj.MoveTo(slot.transform.position);
     }
 
-    private static void MergeObjects(
+    private void MergeObjects(
         PipeObject moving,
         PipeObject target
     )
     {
-        target.MergeWith(moving);
+        if (!TryGetFakeAndModifier(
+                moving,
+                target,
+                out PipeObject fake,
+                out PipeObject modifier
+            ))
+        {
+            BounceObject(moving);
+            return;
+        }
+
+        PipeSlot resultSlot = target.CurrentSlot;
+
+        if (!fake.TryApplyModifier(
+                modifier,
+                out _,
+                out _
+            ))
+        {
+            BounceObject(moving);
+            return;
+        }
+
+        if (fake.CurrentSlot != null)
+            fake.CurrentSlot.ClearOccupant();
+
+        if (modifier.CurrentSlot != null)
+            modifier.CurrentSlot.ClearOccupant();
+
+        if (resultSlot != null)
+        {
+            resultSlot.SetOccupant(fake);
+            fake.MoveTo(resultSlot.transform.position);
+        }
+
+        Destroy(modifier.gameObject);
+    }
+
+    private static bool CanMerge(
+        PipeObject moving,
+        PipeObject target
+    ) =>
+        TryGetFakeAndModifier(
+            moving,
+            target,
+            out PipeObject fake,
+            out PipeObject modifier
+        )
+        && fake.State.TryAddModifier(
+            modifier.State.ObjectData.ModifierType,
+            fake.State.ObjectData,
+            modifier.State.ObjectData,
+            out _
+        );
+
+    private static bool TryGetFakeAndModifier(
+        PipeObject a,
+        PipeObject b,
+        out PipeObject fake,
+        out PipeObject modifier
+    )
+    {
+        fake = null;
+        modifier = null;
+
+        if (a?.State?.ObjectData == null
+            || b?.State?.ObjectData == null)
+            return false;
+
+        if (a.State.ObjectData.Archetype == PipeArchetype.Fake
+            && b.State.ObjectData.Archetype == PipeArchetype.Modifier)
+        {
+            fake = a;
+            modifier = b;
+            return true;
+        }
+
+        if (b.State.ObjectData.Archetype == PipeArchetype.Fake
+            && a.State.ObjectData.Archetype == PipeArchetype.Modifier)
+        {
+            fake = b;
+            modifier = a;
+            return true;
+        }
+
+        return false;
     }
 
     private void ShoveObject(PipeObject target)

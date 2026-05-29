@@ -290,8 +290,8 @@ public class ThrowSystem : MonoBehaviour
     }
 
     private static float GetThrowPower(PipeObject obj) =>
-        obj?.Data != null
-            ? Mathf.Max(0.1f, obj.Data.ThrowPower)
+        obj?.State?.ObjectData != null
+            ? Mathf.Max(0.1f, obj.State.ObjectData.ThrowPower)
             : 1f;
 
     public void PreviewLaunch(PipeObject obj, Vector2 pull)
@@ -368,10 +368,13 @@ public class ThrowSystem : MonoBehaviour
     }
 
     private static int GetWeight(PipeObject obj) =>
-        Mathf.Max(1, obj?.Data?.Weight ?? 1);
+        Mathf.Max(1, obj?.State?.ObjectData?.Weight ?? 1);
 
     private static float GetLaunchAccel(PipeObject obj) =>
-        Mathf.Max(0.1f, obj?.Data?.LaunchAccelModifier ?? 1f);
+        Mathf.Max(
+            0.1f,
+            obj?.State?.ObjectData?.LaunchAccelModifier ?? 1f
+        );
 
     private IEnumerator FlyAndLandRoutine(
         PipeObject obj,

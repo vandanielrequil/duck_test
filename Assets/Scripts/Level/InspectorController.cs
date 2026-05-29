@@ -102,7 +102,7 @@ public class InspectorController : MonoBehaviour
         OnInspectionResolved?.Invoke(obj, outcome, duckiness);
 
         Debug.Log(
-            $"[Inspector] {obj.Data?.name}: duckiness={duckiness}/3 "
+            $"[Inspector] {obj.State?.ObjectData?.name}: duckiness={duckiness}/3 "
             + $"-> {outcome}, anger+={angerDelta}, tier={_anger.Tier}"
         );
 

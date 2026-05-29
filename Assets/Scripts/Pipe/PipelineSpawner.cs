@@ -3,6 +3,7 @@ using UnityEngine;
 public class PipelineSpawner : MonoBehaviour
 {
     [SerializeField] private PipelineController _pipeline;
+    [SerializeField] private PipeObject _objectPrefab;
     [SerializeField] private float _spawnOffset = 2f;
 
     private SpawnEntry[] _queue = System.Array.Empty<SpawnEntry>();
@@ -10,6 +11,8 @@ public class PipelineSpawner : MonoBehaviour
 
     public bool QueueFinished =>
         _queue == null || _queueIndex >= _queue.Length;
+
+    public PipeObject ObjectPrefab => _objectPrefab;
 
     public void BindQueue(SpawnEntry[] queue)
     {
@@ -38,10 +41,10 @@ public class PipelineSpawner : MonoBehaviour
         if (!TryDequeue(out PipeObjectData data))
             return;
 
-        if (data == null || data.SpawnPrefab == null)
+        if (data == null || _objectPrefab == null)
         {
             Debug.LogWarning(
-                $"[Spawner] Missing spawn prefab for {data?.name}"
+                $"[Spawner] Missing object data or object prefab for {data?.name}"
             );
             return;
         }
@@ -49,24 +52,13 @@ public class PipelineSpawner : MonoBehaviour
         Vector3 spawnPos =
             tail.transform.position + Vector3.right * _spawnOffset;
 
-        GameObject instance = Instantiate(
-            data.SpawnPrefab,
+        PipeObject spawned = Instantiate(
+            _objectPrefab,
             spawnPos,
             Quaternion.identity
         );
 
-        PipeObject spawned = instance.GetComponent<PipeObject>();
-        if (spawned == null)
-        {
-            Debug.LogWarning(
-                $"[Spawner] Prefab {data.SpawnPrefab.name} has no PipeObject."
-            );
-            Destroy(instance);
-            return;
-        }
-
-        if (spawned.Data == null)
-            spawned.Data = data;
+        spawned.Initialize(data);
 
         tail.SetOccupant(spawned);
         spawned.MoveTo(tail.transform.position);
