@@ -14,8 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelConfig
   LevelId: level_02
   DisplayName: Merge Training
-  MoveInterval: 10
+  MoveInterval: 2
   SpawnQueue:
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
   - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
   - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
   Goals:

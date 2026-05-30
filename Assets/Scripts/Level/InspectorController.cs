@@ -82,9 +82,6 @@ public class InspectorController : MonoBehaviour
         if (_pipeline != null)
             _pipeline.IsPaused = true;
 
-        if (_gameState != null)
-            _gameState.SetState(PipeGameState.Inspecting);
-
         obj.OnInspect();
 
         float duration = GetInspectionDuration();
@@ -110,9 +107,6 @@ public class InspectorController : MonoBehaviour
             obj.CurrentSlot.ClearOccupant();
 
         Destroy(obj.gameObject);
-
-        if (_gameState != null && !_levelEnded)
-            _gameState.SetState(PipeGameState.Playing);
 
         if (_pipeline != null && !_levelEnded)
             _pipeline.IsPaused = false;
