@@ -741,7 +741,7 @@ MonoBehaviour:
   _thrustForce: 24
   _maxSpeed: 16
   _velocityDamping: 4
-  _maxTargetHorizontalDistance: 1.25
+  _maxTargetHorizontalDistance: 1.22
   _stickPivot: {fileID: 0}
   _logLaunchFailures: 1
   _movementZoneDepthBelowAxis: 1
