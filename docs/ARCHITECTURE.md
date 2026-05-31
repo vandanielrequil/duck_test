@@ -21,8 +21,8 @@
 | `PipelineController` | Тик сдвига слотов, блокируется инспектором |
 | `PipelineSpawner` | Спавн из очереди уровня (`SpawnEntry[]`) |
 | `PipelineInteractionResolver` | Merge / shove / bounce при бросках |
-| `ThrowSystem` + `BatterController` | Бросок объектов по слотам |
-| `PipeObjectData` | ScriptableObject: archetype, tags, weight, **BaseDuckiness**, SpawnPrefab |
+| `ThrowSystem` | Клик по объекту пайплайна: бросок назад на `Weight` слотов |
+| `PipeObjectData` | ScriptableObject: archetype, tags, weight, **BaseDuckiness**, visual sprite/prefab |
 
 **Archetypes:** `Duck`, `Fake`, `Modifier`.
 
@@ -135,7 +135,7 @@ Assets/Scripts/
     PipeObject.cs              — Duckiness, MergeWith returns merged
     PipeObjectData.cs          — BaseDuckiness
     GameStateManager.cs
-    ThrowSystem.cs, BatterController.cs, ...
+    ThrowSystem.cs
 ```
 
 `PipeInspectorController` — obsolete wrapper над `InspectorController`.
@@ -144,9 +144,9 @@ Assets/Scripts/
 
 ## PipeObjectData и спавн
 
-- У каждого spawnable объекта: **`SpawnPrefab`** + **`BaseDuckiness`** на asset.
-- `PipelineSpawner` инстанцирует `data.SpawnPrefab`, проставляет `PipeObject.Data = data`.
-- Merge через `PipeObject.hardcodedMerge` (prefab результата).
+- У каждого spawnable объекта: **`PipeObjectData`** с gameplay-полями и visual sprite/prefab.
+- `PipelineSpawner` инстанцирует общий `PipeObject` shell prefab и вызывает `Initialize(data)`.
+- Merge фейка с `Paint` / `Kit` хранится в `PipeObjectState` и меняет visual-вариант фейка.
 
 Доп. data-ассеты: `FakeDuckData`, `DuckificatorData`; обновлены `DuckData`, `BeakData`, `CrocData`.
 

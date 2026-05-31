@@ -282,11 +282,9 @@ public class PipelineController : MonoBehaviour, IPipelineControl
             return null;
 
         int targetIndex = obj.CurrentSlot.Index + signedOffset;
-        targetIndex = Mathf.Clamp(
-            targetIndex,
-            0,
-            _slots.Count - 1
-        );
+
+        if (targetIndex < 0 || targetIndex >= _slots.Count)
+            return null;
 
         return _slots[targetIndex];
     }

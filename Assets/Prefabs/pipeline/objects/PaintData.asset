@@ -23,8 +23,9 @@ MonoBehaviour:
   BaseDuckiness: 3
   ModifierType: 1
   FollowSpeed: 8
-  Weight: 2
-  LaunchAccelModifier: 1
+  Weight: 3
+  FlightSpeedMultiplier: 1
+  FlightArcMultiplier: 1
   CanBeMerged: 1
   CanBeShoved: 1
   DefaultInteraction: 4

@@ -78,12 +78,18 @@ public class PipeObjectData : ScriptableObject
 
     public float FollowSpeed = 8f;
 
+    [Min(1)]
     public int Weight = 1;
 
+    [Header("Flight Visuals")]
     [Tooltip(
-        "Flight speed only (shorter flight). Does not change which slot the batter selects."
+        "Visual flight speed only. Does not change how many slots the object flies."
     )]
-    public float LaunchAccelModifier = 1f;
+    [FormerlySerializedAs("LaunchAccelModifier")]
+    public float FlightSpeedMultiplier = 1f;
+
+    [Tooltip("Visual flight arc height multiplier.")]
+    public float FlightArcMultiplier = 1f;
 
     public bool CanBeMerged = true;
 
@@ -93,13 +99,10 @@ public class PipeObjectData : ScriptableObject
         DefaultInteraction =
             PipeInteractionKind.Reject;
 
-    [Tooltip("Used by legacy helpers only; batter aim ignores this.")]
-    public float ThrowPower =>
-        LaunchAccelModifier
-        / Mathf.Max(1, Weight);
-
     private void OnValidate()
     {
+        Weight = Mathf.Max(1, Weight);
+
         if (BaseDuckiness > 0)
             return;
 
