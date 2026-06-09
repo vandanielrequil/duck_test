@@ -18,13 +18,13 @@ MonoBehaviour:
   DisplayVisualPrefab: {fileID: 1899981239418425701, guid: e4d0a3c57fd74754ab66573d57b97255, type: 3}
   FakeVisualPrefab: {fileID: 1899981239418425701, guid: e4d0a3c57fd74754ab66573d57b97255, type: 3}
   FakePaintVisualPrefab: {fileID: 1899981239418425701, guid: d3d89f875b161ac4a986ab6659139067, type: 3}
-  FakeKitVisualPrefab: {fileID: 0}
-  FakePaintKitVisualPrefab: {fileID: 0}
+  FakeKitVisualPrefab: {fileID: 1899981239418425701, guid: 4663538e492efb1498856945db7d2e42, type: 3}
+  FakePaintKitVisualPrefab: {fileID: 1899981239418425701, guid: 4faae68a0621be64e8293b3147bb2573, type: 3}
   BaseDuckiness: 0
   ModifierType: 0
   FollowSpeed: 8
   Weight: 1
-  FlightSpeedMultiplier: 0.1
+  FlightSpeedMultiplier: 1
   FlightArcMultiplier: 1
   CanBeMerged: 1
   CanBeShoved: 0

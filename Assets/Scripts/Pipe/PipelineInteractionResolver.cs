@@ -73,7 +73,7 @@ public class PipelineInteractionResolver : MonoBehaviour
             ? InteractionResult.HomerunLeft
             : InteractionResult.HomerunRight;
 
-        Debug.Log($"Interaction: {kind}");
+        Debug.Log($"Interaction: ResolveHomerun {kind}");
 
         Destroy(movingObject.gameObject);
         return kind;
@@ -95,11 +95,18 @@ public class PipelineInteractionResolver : MonoBehaviour
             return InteractionResult.Merge;
 
         if (IsWeightBasedPair(m, t))
+        {
+            Debug.Log("DetermineInteraction - WeightBasedPair debug");
             return ResolveWeightBased(moving, target);
+        }
 
         if (IsShovePair(m, t))
+        {
+            Debug.Log("DetermineInteraction - ShovePair debug");
             return ResolveWeightBased(moving, target);
+        }
 
+        Debug.Log("DetermineInteraction - Bounce debug");
         return InteractionResult.Bounce;
     }
 
@@ -124,7 +131,11 @@ public class PipelineInteractionResolver : MonoBehaviour
             || (moving == PipeArchetype.Duck
                 && target == PipeArchetype.Duck)
             || (moving == PipeArchetype.Modifier
-                && target == PipeArchetype.Modifier);
+                && target == PipeArchetype.Modifier)
+            || (moving == PipeArchetype.Fake
+                && target == PipeArchetype.Modifier)
+            || (moving == PipeArchetype.Fake
+                && target == PipeArchetype.Duck);
     }
 
     private static bool IsWeightBasedPair(
@@ -148,11 +159,16 @@ public class PipelineInteractionResolver : MonoBehaviour
         int movingWeight = GetWeight(moving);
         int targetWeight = GetWeight(target);
 
-        if (movingWeight > targetWeight)
+        if (movingWeight < targetWeight) {
+            Debug.Log($"Shove debug {movingWeight} > {targetWeight}");
             return InteractionResult.Shove;
+        }
 
-        if (movingWeight < targetWeight)
+        if (movingWeight > targetWeight)
+        {
+            Debug.Log($"Bounce debug {movingWeight} < {targetWeight}");
             return InteractionResult.Bounce;
+        }
 
         if (HasEmptySlotBehind(target))
             return InteractionResult.Move;

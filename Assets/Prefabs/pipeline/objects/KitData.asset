@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29a7b1e6d80cf453194cad0352efb678, type: 3}
-  m_Name: PaintData
+  m_Name: KitData
   m_EditorClassIdentifier: Assembly-CSharp::PipeObjectData
   ObjectId: 
   Archetype: 2
   Tags: 0
-  DisplayVisualPrefab: {fileID: 3608969512155067739, guid: 3f66ab8148a433047b09e7969a9c4045, type: 3}
+  DisplayVisualPrefab: {fileID: 1402939194423010156, guid: 7058f097758fe6243b23f3e0e5a8a79e, type: 3}
   FakeVisualPrefab: {fileID: 0}
   FakePaintVisualPrefab: {fileID: 0}
   FakeKitVisualPrefab: {fileID: 0}
   FakePaintKitVisualPrefab: {fileID: 0}
-  BaseDuckiness: 3
-  ModifierType: 1
+  BaseDuckiness: 0
+  ModifierType: 2
   FollowSpeed: 8
   Weight: 2
   FlightSpeedMultiplier: 1
