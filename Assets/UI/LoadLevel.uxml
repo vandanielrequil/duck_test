@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:GroupBox style="height: 100px; flex-direction: row; align-items: auto; align-self: center;">
+        <ui:Button text="Level 1" name="Level_1" style="align-self: center; height: 36px; width: 96px; justify-content: flex-start; flex-direction: row; flex-wrap: nowrap; -unity-text-align: lower-center; white-space: pre-wrap; text-overflow: ellipsis; align-items: auto; align-content: auto;"/>
+        <ui:Button text="Level 2" name="Level_2" style="align-self: center; height: 36px; width: 96px; justify-content: flex-start; flex-direction: row; flex-wrap: nowrap; -unity-text-align: lower-center; white-space: pre-wrap; text-overflow: ellipsis; align-items: auto;"/>
+    </ui:GroupBox>
+</ui:UXML>

@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class LevelSession : MonoBehaviour
@@ -10,14 +9,24 @@ public class LevelSession : MonoBehaviour
     [SerializeField] private PipelineSpawner _spawner;
     [SerializeField] private GameStateManager _gameState;
     [SerializeField] private LevelResultsScreen _resultsScreen;
+    [SerializeField] private LevelMenuController _menuController;
 
     [Header("Debug")]
+    [SerializeField] private bool _autoStartLevelForDebug;
     [SerializeField] private bool _ignoreSaveForTesting;
     [SerializeField] private int _debugStartLevelIndex;
 
     private int _levelIndex;
     private bool _levelEnded;
     private LevelConfig _activeConfig;
+
+    public LevelDatabase Database => _database;
+    public int ActiveLevelIndex => _levelIndex;
+    public bool IsLevelActive => _activeConfig != null && !_levelEnded;
+    public int LevelCount => _database?.Levels?.Length ?? 0;
+    public bool HasNextLevel =>
+        _database?.Levels != null
+        && _levelIndex + 1 < _database.Levels.Length;
 
     private void Awake()
     {
@@ -31,6 +40,8 @@ public class LevelSession : MonoBehaviour
             _spawner = FindAnyObjectByType<PipelineSpawner>();
         if (_gameState == null)
             _gameState = FindAnyObjectByType<GameStateManager>();
+        if (_menuController == null)
+            _menuController = FindAnyObjectByType<LevelMenuController>();
 
         if (_levelManager != null)
             _levelManager.OnAllGoalsComplete += HandleAllGoalsComplete;
@@ -41,11 +52,14 @@ public class LevelSession : MonoBehaviour
         if (_pipeline != null)
             _pipeline.OnPipelineDrained += HandlePipelineDrained;
 
-        int startIndex = _ignoreSaveForTesting
-            ? _debugStartLevelIndex
-            : PlayerProgress.CurrentLevelIndex;
-
-        BeginLevel(startIndex);
+        if (_autoStartLevelForDebug)
+            StartLevel(
+                _ignoreSaveForTesting
+                    ? _debugStartLevelIndex
+                    : PlayerProgress.CurrentLevelIndex
+            );
+        else
+            ReturnToMenu();
     }
 
     private void OnDestroy()
@@ -60,7 +74,79 @@ public class LevelSession : MonoBehaviour
             _pipeline.OnPipelineDrained -= HandlePipelineDrained;
     }
 
-    public void BeginLevel(int index)
+    public bool IsLevelUnlocked(int index)
+    {
+        if (index < 0 || index >= LevelCount)
+            return false;
+
+        if (_ignoreSaveForTesting)
+            return true;
+
+        return index <= PlayerProgress.CurrentLevelIndex;
+    }
+
+    public void StartCurrentLevel()
+    {
+        int startIndex = _ignoreSaveForTesting
+            ? _debugStartLevelIndex
+            : PlayerProgress.CurrentLevelIndex;
+
+        StartLevel(startIndex);
+    }
+
+    public void StartLevel(int index)
+    {
+        if (_database == null || _database.Levels == null
+            || _database.Levels.Length == 0)
+        {
+            Debug.LogError("[LevelSession] Level database is empty.");
+            return;
+        }
+
+        if (!IsLevelUnlocked(index))
+        {
+            Debug.LogWarning(
+                $"[LevelSession] Level index {index} is locked or missing."
+            );
+            return;
+        }
+
+        BeginLevel(index);
+    }
+
+    public void RetryCurrentLevel()
+    {
+        BeginLevel(_levelIndex);
+    }
+
+    public void StartNextLevel()
+    {
+        if (!HasNextLevel)
+        {
+            Debug.Log("[LevelSession] Campaign complete.");
+            if (_gameState != null)
+                _gameState.SetState(PipeGameState.CampaignComplete);
+            return;
+        }
+
+        StartLevel(_levelIndex + 1);
+    }
+
+    public void ReturnToMenu()
+    {
+        _levelEnded = true;
+        _activeConfig = null;
+        _resultsScreen?.HideImmediate();
+        _inspector?.SetLevelEnded(true);
+        _pipeline?.StopPipeline();
+
+        if (_gameState != null)
+            _gameState.SetState(PipeGameState.MainMenu);
+
+        _menuController?.ShowMainMenu();
+    }
+
+    private void BeginLevel(int index)
     {
         if (_database == null || _database.Levels == null
             || _database.Levels.Length == 0)
@@ -74,6 +160,7 @@ public class LevelSession : MonoBehaviour
         _levelEnded = false;
 
         _resultsScreen?.HideImmediate();
+        _menuController?.HideAll();
 
         _levelManager?.Load(_activeConfig);
         _inspector?.BindLevel(_activeConfig, _levelManager, false);
@@ -89,8 +176,6 @@ public class LevelSession : MonoBehaviour
             + $"(index {_levelIndex})"
         );
     }
-
-    private LevelEndOutcome _lastOutcome;
 
     private void HandleAllGoalsComplete()
     {
@@ -131,7 +216,6 @@ public class LevelSession : MonoBehaviour
             return;
 
         _levelEnded = true;
-        _lastOutcome = outcome;
         _inspector?.SetLevelEnded(true);
         _pipeline?.StopPipeline();
 
@@ -144,35 +228,7 @@ public class LevelSession : MonoBehaviour
             );
         }
 
-        LevelResultsSnapshot snapshot =
-            _levelManager.BuildResultsSnapshot(
-                outcome,
-                reason,
-                _inspector != null ? _inspector.RageModeCount : 0
-            );
-
-        if (_resultsScreen != null)
-        {
-            _resultsScreen.Show(snapshot, OnResultsContinue);
-        }
-        else
-        {
-            Debug.Log(
-                "[LevelSession] Level ended without results screen."
-            );
-            StartCoroutine(DelayedContinue(2f));
-        }
-    }
-
-    private IEnumerator DelayedContinue(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        OnResultsContinue();
-    }
-
-    private void OnResultsContinue()
-    {
-        if (_lastOutcome == LevelEndOutcome.Success
+        if (outcome == LevelEndOutcome.Success
             && _activeConfig != null
             && !_ignoreSaveForTesting)
         {
@@ -182,23 +238,29 @@ public class LevelSession : MonoBehaviour
             );
         }
 
-        if (_lastOutcome == LevelEndOutcome.Fail)
+        LevelResultsSnapshot snapshot =
+            _levelManager.BuildResultsSnapshot(
+                outcome,
+                reason,
+                _inspector != null ? _inspector.RageModeCount : 0
+            );
+
+        if (_resultsScreen != null)
         {
-            BeginLevel(_levelIndex);
-            return;
+            _resultsScreen.Show(
+                snapshot,
+                HasNextLevel,
+                StartNextLevel,
+                RetryCurrentLevel,
+                ReturnToMenu
+            );
         }
-
-        int nextIndex = _levelIndex + 1;
-
-        if (_database != null
-            && nextIndex < _database.Levels.Length)
+        else
         {
-            BeginLevel(nextIndex);
-            return;
+            Debug.Log(
+                "[LevelSession] Level ended without results screen."
+            );
+            ReturnToMenu();
         }
-
-        Debug.Log("[LevelSession] Campaign complete.");
-        if (_gameState != null)
-            _gameState.SetState(PipeGameState.CampaignComplete);
     }
 }

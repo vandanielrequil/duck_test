@@ -2,6 +2,7 @@ using UnityEngine;
 
 public enum PipeGameState
 {
+    MainMenu,
     Playing,
     Inspecting,
     GameOver,
