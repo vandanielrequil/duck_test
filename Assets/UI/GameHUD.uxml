@@ -1,0 +1,5 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:GroupBox style="height: 440px; flex-direction: column-reverse; align-items: stretch; align-self: auto; width: 344px; justify-content: flex-start; align-content: stretch;">
+        <ui:Button text="Pause" name="PauseButton" style="align-self: center; height: 36px; width: 96px; justify-content: flex-start; flex-direction: row; flex-wrap: nowrap; -unity-text-align: lower-center; white-space: pre-wrap; text-overflow: ellipsis; align-items: auto; align-content: auto;"/>
+    </ui:GroupBox>
+</ui:UXML>

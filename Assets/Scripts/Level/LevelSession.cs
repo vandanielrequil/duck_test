@@ -10,6 +10,7 @@ public class LevelSession : MonoBehaviour
     [SerializeField] private GameStateManager _gameState;
     [SerializeField] private LevelResultsScreen _resultsScreen;
     [SerializeField] private LevelMenuController _menuController;
+    [SerializeField] private LevelPauseController _pauseController;
 
     [Header("Debug")]
     [SerializeField] private bool _autoStartLevelForDebug;
@@ -19,6 +20,9 @@ public class LevelSession : MonoBehaviour
     private int _levelIndex;
     private bool _levelEnded;
     private LevelConfig _activeConfig;
+    private bool _isPaused;
+    private bool _pipelinePausedBeforePause;
+    private float _timeScaleBeforePause = 1f;
 
     public LevelDatabase Database => _database;
     public int ActiveLevelIndex => _levelIndex;
@@ -42,6 +46,8 @@ public class LevelSession : MonoBehaviour
             _gameState = FindAnyObjectByType<GameStateManager>();
         if (_menuController == null)
             _menuController = FindAnyObjectByType<LevelMenuController>();
+        if (_pauseController == null)
+            _pauseController = FindAnyObjectByType<LevelPauseController>();
 
         if (_levelManager != null)
             _levelManager.OnAllGoalsComplete += HandleAllGoalsComplete;
@@ -116,6 +122,7 @@ public class LevelSession : MonoBehaviour
 
     public void RetryCurrentLevel()
     {
+        ClearPauseState();
         BeginLevel(_levelIndex);
     }
 
@@ -134,11 +141,13 @@ public class LevelSession : MonoBehaviour
 
     public void ReturnToMenu()
     {
+        ClearPauseState();
         _levelEnded = true;
         _activeConfig = null;
         _resultsScreen?.HideImmediate();
         _inspector?.SetLevelEnded(true);
         _pipeline?.StopPipeline();
+        _pauseController?.HideAll();
 
         if (_gameState != null)
             _gameState.SetState(PipeGameState.MainMenu);
@@ -148,6 +157,8 @@ public class LevelSession : MonoBehaviour
 
     private void BeginLevel(int index)
     {
+        ClearPauseState();
+
         if (_database == null || _database.Levels == null
             || _database.Levels.Length == 0)
         {
@@ -161,6 +172,7 @@ public class LevelSession : MonoBehaviour
 
         _resultsScreen?.HideImmediate();
         _menuController?.HideAll();
+        _pauseController?.HideAll();
 
         _levelManager?.Load(_activeConfig);
         _inspector?.BindLevel(_activeConfig, _levelManager, false);
@@ -171,10 +183,58 @@ public class LevelSession : MonoBehaviour
         if (_gameState != null)
             _gameState.SetState(PipeGameState.Playing);
 
+        _pauseController?.ShowGameHud();
+
         Debug.Log(
             $"[LevelSession] Started {_activeConfig.DisplayName} "
             + $"(index {_levelIndex})"
         );
+    }
+
+    public void PauseLevel()
+    {
+        if (!IsLevelActive || _isPaused)
+            return;
+
+        _isPaused = true;
+        _pipelinePausedBeforePause = _pipeline != null && _pipeline.IsPaused;
+        _timeScaleBeforePause = Time.timeScale;
+
+        if (_pipeline != null)
+            _pipeline.IsPaused = true;
+
+        if (_gameState != null)
+            _gameState.SetState(PipeGameState.Paused);
+
+        Time.timeScale = 0f;
+    }
+
+    public void ResumeLevel()
+    {
+        if (!IsLevelActive || !_isPaused)
+            return;
+
+        RestorePauseState();
+
+        if (_gameState != null)
+            _gameState.SetState(PipeGameState.Playing);
+    }
+
+    private void ClearPauseState()
+    {
+        if (!_isPaused)
+            return;
+
+        RestorePauseState();
+    }
+
+    private void RestorePauseState()
+    {
+        if (_pipeline != null)
+            _pipeline.IsPaused = _pipelinePausedBeforePause;
+
+        Time.timeScale = _timeScaleBeforePause;
+        _isPaused = false;
     }
 
     private void HandleAllGoalsComplete()
@@ -216,8 +276,10 @@ public class LevelSession : MonoBehaviour
             return;
 
         _levelEnded = true;
+        ClearPauseState();
         _inspector?.SetLevelEnded(true);
         _pipeline?.StopPipeline();
+        _pauseController?.HideAll();
 
         if (_gameState != null)
         {

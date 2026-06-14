@@ -890,6 +890,7 @@ GameObject:
   - component: {fileID: 990001005}
   - component: {fileID: 990001006}
   - component: {fileID: 990001007}
+  - component: {fileID: 990001008}
   m_Layer: 0
   m_Name: LevelSystems
   m_TagString: Untagged
@@ -972,6 +973,7 @@ MonoBehaviour:
   _gameState: {fileID: 990001003}
   _resultsScreen: {fileID: 0}
   _menuController: {fileID: 990001007}
+  _pauseController: {fileID: 990001008}
   _autoStartLevelForDebug: 0
   _ignoreSaveForTesting: 1
   _debugStartLevelIndex: 0
@@ -989,6 +991,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelMenuController
   _levelSession: {fileID: 990001006}
   _menuFacadeBehaviour: {fileID: 0}
+--- !u!114 &990001008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990001001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c2d3e4f5a6478899aabbccddeeff02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelPauseController
+  _levelSession: {fileID: 990001006}
+  _pauseFacadeBehaviour: {fileID: 0}
 --- !u!1 &1097418565
 GameObject:
   m_ObjectHideFlags: 0
