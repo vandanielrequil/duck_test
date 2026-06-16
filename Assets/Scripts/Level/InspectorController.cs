@@ -20,19 +20,18 @@ public class InspectorController : MonoBehaviour
 
     public bool IsBusy => _inspectionRoutine != null;
     public InspectorAngerState Anger => _anger;
-    public int RageModeCount => _anger.RageModeCount;
 
     public event Action<PipeObject, InspectionOutcome, int> OnInspectionResolved;
-    public event Action<int> OnRageModeEntered;
+    public event Action OnRageFilled;
 
     private void OnEnable()
     {
-        _anger.OnRageModeEntered += HandleRageModeEntered;
+        _anger.OnRageFilled += HandleRageFilled;
     }
 
     private void OnDisable()
     {
-        _anger.OnRageModeEntered -= HandleRageModeEntered;
+        _anger.OnRageFilled -= HandleRageFilled;
 
         if (_inspectionRoutine != null)
         {
@@ -120,8 +119,7 @@ public class InspectorController : MonoBehaviour
         if (_config == null)
             return 5f;
 
-        float multiplier = _anger.GetInspectionSpeedMultiplier();
-        return _config.BaseInspectionDuration / Mathf.Max(0.1f, multiplier);
+        return _config.BaseInspectionDuration;
     }
 
     private InspectionOutcome ResolveOutcome(PipeObject obj)
@@ -160,17 +158,17 @@ public class InspectorController : MonoBehaviour
         };
     }
 
-    private void HandleRageModeEntered(int count)
+    private void HandleRageFilled()
     {
-        Debug.Log($"[Inspector] Rage mode #{count}");
-        OnRageModeEntered?.Invoke(count);
+        Debug.Log("[Inspector] Rage bar full");
+        OnRageFilled?.Invoke();
     }
 }
 
 public class InspectorAngerState
 {
     public int Current { get; private set; }
-    public int RageModeCount { get; private set; }
+    public int Max => _config != null ? Mathf.Max(1, _config.AngerMax) : 6;
 
     private LevelConfig _config;
 
@@ -192,7 +190,7 @@ public class InspectorAngerState
     }
 
     public event Action<int> OnAngerChanged;
-    public event Action<int> OnRageModeEntered;
+    public event Action OnRageFilled;
 
     public void BindConfig(LevelConfig config) =>
         _config = config;
@@ -200,7 +198,6 @@ public class InspectorAngerState
     public void Reset()
     {
         Current = 0;
-        RageModeCount = 0;
         OnAngerChanged?.Invoke(Current);
     }
 
@@ -216,28 +213,8 @@ public class InspectorAngerState
         );
         OnAngerChanged?.Invoke(Current);
 
-        if (Current >= _config.AngerThresholdTier2)
-            EnterRageMode();
+        if (Current >= Max)
+            OnRageFilled?.Invoke();
     }
 
-    private void EnterRageMode()
-    {
-        RageModeCount++;
-        OnRageModeEntered?.Invoke(RageModeCount);
-        Current = 0;
-        OnAngerChanged?.Invoke(Current);
-    }
-
-    public float GetInspectionSpeedMultiplier()
-    {
-        if (_config == null)
-            return 1f;
-
-        return Tier switch
-        {
-            2 => _config.Tier2SpeedMultiplier,
-            1 => _config.Tier1SpeedMultiplier,
-            _ => 1f,
-        };
-    }
 }

@@ -18,7 +18,7 @@ public enum LevelEndReason
 {
     GoalsComplete,
     PipelineDrained,
-    RageModeLimit,
+    RageBarFull,
 }
 
 public enum LevelEndOutcome
@@ -43,6 +43,5 @@ public struct LevelResultsSnapshot
     public LevelEndOutcome Outcome;
     public LevelEndReason Reason;
     public LevelGoalResultLine[] GoalLines;
-    public int RageModesTriggered;
     public int ObjectsApproved;
 }

@@ -20,7 +20,7 @@ MonoBehaviour:
   FakePaintVisualPrefab: {fileID: 0}
   FakeKitVisualPrefab: {fileID: 0}
   FakePaintKitVisualPrefab: {fileID: 0}
-  BaseDuckiness: 3
+  BaseDuckiness: 2
   ModifierType: 1
   FollowSpeed: 8
   Weight: 2

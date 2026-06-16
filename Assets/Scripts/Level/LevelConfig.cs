@@ -21,8 +21,6 @@ public class LevelConfig : ScriptableObject
 
     [Header("Inspector")]
     public float BaseInspectionDuration = 5f;
-    public float Tier1SpeedMultiplier = 1.5f;
-    public float Tier2SpeedMultiplier = 2f;
     public int AngerThresholdTier1 = 3;
     public int AngerThresholdTier2 = 6;
     public int AngerMax = 6;

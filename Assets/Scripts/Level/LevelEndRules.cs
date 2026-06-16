@@ -10,14 +10,14 @@ public struct LevelEndRules
     [Tooltip("Win when every level goal is complete.")]
     public bool WinOnGoalsComplete;
 
-    [Tooltip("Lose after this many rage mode entries (anger reaches max).")]
-    public int LoseOnRageModeCount;
+    [Tooltip("Lose when the inspector rage bar reaches its maximum.")]
+    public bool LoseOnRageBarFull;
 
     public static LevelEndRules Default =>
         new LevelEndRules
         {
             WinOnPipelineDrained = true,
             WinOnGoalsComplete = true,
-            LoseOnRageModeCount = 3,
+            LoseOnRageBarFull = true,
         };
 }

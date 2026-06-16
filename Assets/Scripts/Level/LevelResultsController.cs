@@ -124,7 +124,6 @@ public class LevelResultsController : MonoBehaviour, ILevelResultsActions
         lines.AppendLine(snapshot.LevelName);
         lines.AppendLine($"Reason: {snapshot.Reason}");
         lines.AppendLine($"Approved: {snapshot.ObjectsApproved}");
-        lines.AppendLine($"Rage modes: {snapshot.RageModesTriggered}");
         lines.AppendLine();
 
         if (snapshot.GoalLines != null)

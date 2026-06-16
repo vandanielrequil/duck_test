@@ -110,8 +110,7 @@ public class LevelManager : MonoBehaviour
 
     public LevelResultsSnapshot BuildResultsSnapshot(
         LevelEndOutcome outcome,
-        LevelEndReason reason,
-        int rageModesTriggered
+        LevelEndReason reason
     )
     {
         var lines = new LevelGoalResultLine[_goals.Count];
@@ -136,7 +135,6 @@ public class LevelManager : MonoBehaviour
             Outcome = outcome,
             Reason = reason,
             GoalLines = lines,
-            RageModesTriggered = rageModesTriggered,
             ObjectsApproved = _objectsApproved,
         };
     }

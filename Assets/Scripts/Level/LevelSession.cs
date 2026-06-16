@@ -55,7 +55,7 @@ public class LevelSession : MonoBehaviour
             _levelManager.OnAllGoalsComplete += HandleAllGoalsComplete;
 
         if (_inspector != null)
-            _inspector.OnRageModeEntered += HandleRageModeEntered;
+            _inspector.OnRageFilled += HandleRageFilled;
 
         if (_pipeline != null)
             _pipeline.OnPipelineDrained += HandlePipelineDrained;
@@ -76,7 +76,7 @@ public class LevelSession : MonoBehaviour
             _levelManager.OnAllGoalsComplete -= HandleAllGoalsComplete;
 
         if (_inspector != null)
-            _inspector.OnRageModeEntered -= HandleRageModeEntered;
+            _inspector.OnRageFilled -= HandleRageFilled;
 
         if (_pipeline != null)
             _pipeline.OnPipelineDrained -= HandlePipelineDrained;
@@ -261,15 +261,15 @@ public class LevelSession : MonoBehaviour
         EndLevel(LevelEndOutcome.Success, LevelEndReason.PipelineDrained);
     }
 
-    private void HandleRageModeEntered(int count)
+    private void HandleRageFilled()
     {
         if (_levelEnded || _activeConfig == null)
             return;
 
-        if (count < _activeConfig.EndRules.LoseOnRageModeCount)
+        if (!_activeConfig.EndRules.LoseOnRageBarFull)
             return;
 
-        EndLevel(LevelEndOutcome.Fail, LevelEndReason.RageModeLimit);
+        EndLevel(LevelEndOutcome.Fail, LevelEndReason.RageBarFull);
     }
 
     private void EndLevel(LevelEndOutcome outcome, LevelEndReason reason)
@@ -305,8 +305,7 @@ public class LevelSession : MonoBehaviour
         LevelResultsSnapshot snapshot =
             _levelManager.BuildResultsSnapshot(
                 outcome,
-                reason,
-                _inspector != null ? _inspector.RageModeCount : 0
+                reason
             );
 
         if (_resultsController != null)

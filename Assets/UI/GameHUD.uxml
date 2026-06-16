@@ -1,5 +1,4 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:GroupBox style="height: 440px; flex-direction: column-reverse; align-items: stretch; align-self: auto; width: 344px; justify-content: flex-start; align-content: stretch;">
-        <ui:Button text="Pause" name="PauseButton" style="align-self: center; height: 36px; width: 96px; justify-content: flex-start; flex-direction: row; flex-wrap: nowrap; -unity-text-align: lower-center; white-space: pre-wrap; text-overflow: ellipsis; align-items: auto; align-content: auto;"/>
-    </ui:GroupBox>
+    <ui:ProgressBar value="1" title="rage" name="RageBar" high-value="6" language-direction="Inherit" style="flex-direction: column; height: 48px; width: 551px; overflow: visible;"/>
+    <ui:Button text="Pause" name="PauseButton" style="align-self: center; height: 36px; width: 96px; justify-content: flex-start; flex-direction: row; flex-wrap: nowrap; -unity-text-align: lower-center; white-space: pre-wrap; text-overflow: ellipsis; align-items: auto; align-content: auto;"/>
 </ui:UXML>

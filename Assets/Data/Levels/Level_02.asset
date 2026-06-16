@@ -37,12 +37,10 @@ MonoBehaviour:
     RequiredAmount: 1
     Description: Merge Croc + Beak
   BaseInspectionDuration: 3
-  Tier1SpeedMultiplier: 1.5
-  Tier2SpeedMultiplier: 2
   AngerThresholdTier1: 3
   AngerThresholdTier2: 6
   AngerMax: 6
   EndRules:
     WinOnPipelineDrained: 1
     WinOnGoalsComplete: 1
-    LoseOnRageModeCount: 3
+    LoseOnRageBarFull: 1

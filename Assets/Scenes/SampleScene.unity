@@ -1005,6 +1005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelPauseController
   _levelSession: {fileID: 990001006}
+  _inspector: {fileID: 990001005}
   _pauseFacade: {fileID: 0}
 --- !u!114 &990001009
 MonoBehaviour:

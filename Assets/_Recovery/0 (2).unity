@@ -436,6 +436,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1097418566}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &247547320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 247547321}
+  - component: {fileID: 247547322}
+  m_Layer: 0
+  m_Name: LevelResults
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &247547321
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247547320}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.77289, y: -0.19531, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 538797624}
+  m_Father: {fileID: 1974584703}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &247547322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247547320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1e2f3a4b5c6478899aabbccddeeff04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UILevelResultsScreen
+  _document: {fileID: 538797625}
+  _titleName: Title
+  _bodyName: Body
+  _nextButtonName: Next
+  _retryButtonName: Retry
+  _menuButtonName: Menu
 --- !u!1 &277043281
 GameObject:
   m_ObjectHideFlags: 0
@@ -810,6 +861,61 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &538797623
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 538797624}
+  - component: {fileID: 538797625}
+  m_Layer: 5
+  m_Name: LevelResultsScreenUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &538797624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 538797623}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.77289, y: 0.19531, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 247547321}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &538797625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 538797623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 62a93875637bc944c83614a1b589aa56, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: f78a224c746f1d1479a68d0f27b7b8a4, type: 3}
+  m_SortingOrder: 0
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
 --- !u!1 &618609590
 GameObject:
   m_ObjectHideFlags: 0
@@ -1056,6 +1162,7 @@ GameObject:
   - component: {fileID: 990001006}
   - component: {fileID: 990001007}
   - component: {fileID: 990001008}
+  - component: {fileID: 990001009}
   m_Layer: 0
   m_Name: LevelSystems
   m_TagString: Untagged
@@ -1133,11 +1240,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelSession
   _database: {fileID: 11400000, guid: 55556666777788889999000011112222, type: 2}
   _levelManager: {fileID: 990001004}
-  _inspector: {fileID: 990001005}
+  _inspector: {fileID: 1825136871}
   _pipeline: {fileID: 159366669}
   _spawner: {fileID: 1560194825}
   _gameState: {fileID: 990001003}
-  _resultsScreen: {fileID: 0}
+  _resultsController: {fileID: 990001009}
   _menuController: {fileID: 990001007}
   _pauseController: {fileID: 990001008}
   _autoStartLevelForDebug: 0
@@ -1156,7 +1263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelMenuController
   _levelSession: {fileID: 990001006}
-  _menuFacadeBehaviour: {fileID: 1717389531}
+  _menuFacade: {fileID: 0}
 --- !u!114 &990001008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1170,7 +1277,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelPauseController
   _levelSession: {fileID: 990001006}
-  _pauseFacadeBehaviour: {fileID: 0}
+  _inspector: {fileID: 0}
+  _pauseFacade: {fileID: 0}
+--- !u!114 &990001009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990001001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a1b2c3d4e5f67890123456789abcdef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelResultsController
+  _resultsFacade: {fileID: 247547322}
 --- !u!1 &1097418565
 GameObject:
   m_ObjectHideFlags: 0
@@ -1417,6 +1538,7 @@ MonoBehaviour:
   _gameHudDocument: {fileID: 321906089}
   _pauseMenuDocument: {fileID: 618609592}
   _pauseButtonName: PauseButton
+  _rageBarName: RageBar
   _resumeButtonName: Continue
   _restartButtonName: Restart
   _menuButtonName: Menu
@@ -1709,6 +1831,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 247547321}
   - {fileID: 321906090}
   - {fileID: 1717389532}
   - {fileID: 1452201645}
