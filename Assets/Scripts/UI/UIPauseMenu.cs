@@ -7,10 +7,12 @@ public class UIPauseMenu : LevelPauseFacadeBase
     [FormerlySerializedAs("_pauseButtonDocument")]
     [SerializeField] private UIDocument _gameHudDocument;
     [SerializeField] private UIDocument _pauseMenuDocument;
+    [SerializeField] private LevelManager _levelManager;
 
     [Header("Game HUD")]
     [SerializeField] private string _pauseButtonName = "PauseButton";
     [SerializeField] private string _rageBarName = "RageBar";
+    [SerializeField] private string _taskProgressName = "TaskProgress";
 
     [Header("Pause menu buttons")]
     [FormerlySerializedAs("_continueButtonName")]
@@ -20,20 +22,26 @@ public class UIPauseMenu : LevelPauseFacadeBase
 
     private Button _pauseButton;
     private ProgressBar _rageBar;
+    private TextElement _taskProgress;
     private Button _resumeButton;
     private Button _restartButton;
     private Button _menuButton;
     private int _rageCurrent;
     private int _rageMax = 6;
+    private bool _subscribedToGoals;
 
     private void Awake()
     {
+        if (_levelManager == null)
+            _levelManager = FindAnyObjectByType<LevelManager>();
+
         if (_pauseMenuDocument != null)
             UsePauseMenuDocument(_pauseMenuDocument);
     }
 
     private void OnDestroy()
     {
+        UnsubscribeFromGoals();
         UnbindPauseButton();
         UnbindPauseMenuButtons();
     }
@@ -57,6 +65,10 @@ public class UIPauseMenu : LevelPauseFacadeBase
             root,
             _rageBarName
         );
+        _taskProgress = FindText(
+            root,
+            _taskProgressName
+        );
         Debug.Log(
             $"[RageBar] UseGameHudDocument found={_rageBar != null} "
             + $"name={_rageBarName} rootChildren={root?.childCount ?? -1}"
@@ -64,6 +76,7 @@ public class UIPauseMenu : LevelPauseFacadeBase
 
         BindPauseButton();
         ApplyRage();
+        RefreshTaskProgress();
     }
 
     public void UsePauseMenuDocument(UIDocument document)
@@ -102,6 +115,7 @@ public class UIPauseMenu : LevelPauseFacadeBase
         _rageCurrent = Mathf.Max(0, current);
         _rageMax = Mathf.Max(1, max);
         Debug.Log($"[RageBar] Facade SetRage {_rageCurrent}/{_rageMax}");
+        EnsureGameHudBound();
         ApplyRage();
     }
 
@@ -118,6 +132,7 @@ public class UIPauseMenu : LevelPauseFacadeBase
 
         _pauseButton = null;
         _rageBar = null;
+        _taskProgress = null;
     }
 
     private void BindPauseMenuButtons()
@@ -155,10 +170,14 @@ public class UIPauseMenu : LevelPauseFacadeBase
         BindGameHudDocument();
         ScheduleGameHudRebind();
         ApplyRage();
+        SubscribeToGoals();
+        RefreshTaskProgress();
     }
 
     private void HideGameHudDocument()
     {
+        UnsubscribeFromGoals();
+
         if (_gameHudDocument != null)
             _gameHudDocument.gameObject.SetActive(false);
     }
@@ -226,9 +245,70 @@ public class UIPauseMenu : LevelPauseFacadeBase
 
         root.schedule.Execute(() =>
         {
+            if (_gameHudDocument == null
+                || !_gameHudDocument.gameObject.activeSelf)
+                return;
+
             BindGameHudDocument();
             ApplyRage();
+            RefreshTaskProgress();
         }).ExecuteLater(0);
+    }
+
+    private void EnsureGameHudBound()
+    {
+        if (_rageBar != null)
+            return;
+
+        if (_gameHudDocument == null
+            || !_gameHudDocument.gameObject.activeSelf)
+            return;
+
+        BindGameHudDocument();
+    }
+
+    private void SubscribeToGoals()
+    {
+        if (_subscribedToGoals || _levelManager == null)
+            return;
+
+        _levelManager.OnGoalProgress += HandleGoalProgress;
+        _subscribedToGoals = true;
+    }
+
+    private void UnsubscribeFromGoals()
+    {
+        if (!_subscribedToGoals || _levelManager == null)
+            return;
+
+        _levelManager.OnGoalProgress -= HandleGoalProgress;
+        _subscribedToGoals = false;
+    }
+
+    private void HandleGoalProgress(LevelGoalRuntime goal)
+    {
+        RefreshTaskProgress();
+    }
+
+    private void RefreshTaskProgress()
+    {
+        if (_taskProgress == null || _levelManager == null)
+            return;
+
+        _taskProgress.text = LevelResultsController.BuildGoalProgressText(
+            _levelManager.Goals
+        );
+    }
+
+    private static TextElement FindText(
+        VisualElement root,
+        string elementName
+    )
+    {
+        if (root == null || string.IsNullOrEmpty(elementName))
+            return null;
+
+        return root.Q<TextElement>(elementName);
     }
 
     private void ApplyRage()

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public interface ILevelResultsActions
@@ -138,6 +140,43 @@ public class LevelResultsController : MonoBehaviour, ILevelResultsActions
         }
 
         return lines.ToString();
+    }
+
+    public static string BuildGoalProgressText(LevelGoalResultLine[] lines)
+    {
+        if (lines == null || lines.Length == 0)
+            return string.Empty;
+
+        var sb = new StringBuilder();
+        foreach (LevelGoalResultLine line in lines)
+        {
+            sb.AppendLine(
+                $"{(line.Complete ? "[x]" : "[ ]")} "
+                + $"{line.Description} ({line.Current}/{line.Required})"
+            );
+        }
+
+        return sb.ToString();
+    }
+
+    public static string BuildGoalProgressText(
+        IReadOnlyList<LevelGoalRuntime> goals
+    )
+    {
+        if (goals == null || goals.Count == 0)
+            return string.Empty;
+
+        var sb = new StringBuilder();
+        foreach (LevelGoalRuntime goal in goals)
+        {
+            sb.AppendLine(
+                $"{(goal.IsComplete ? "[x]" : "[ ]")} "
+                + $"{goal.GetDisplayDescription()} "
+                + $"({goal.Current}/{goal.Config.RequiredAmount})"
+            );
+        }
+
+        return sb.ToString();
     }
 
     private void ResolveFacade()

@@ -51,6 +51,8 @@ public class LevelSession : MonoBehaviour
         if (_pauseController == null)
             _pauseController = FindAnyObjectByType<LevelPauseController>();
 
+        _pauseController?.BindInspector(_inspector);
+
         if (_levelManager != null)
             _levelManager.OnAllGoalsComplete += HandleAllGoalsComplete;
 
@@ -185,6 +187,7 @@ public class LevelSession : MonoBehaviour
         if (_gameState != null)
             _gameState.SetState(PipeGameState.Playing);
 
+        _pauseController?.BindInspector(_inspector);
         _pauseController?.ShowGameHud();
 
         Debug.Log(

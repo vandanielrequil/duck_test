@@ -8,6 +8,7 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
     [Header("Text element names")]
     [SerializeField] private string _titleName = "Title";
     [SerializeField] private string _bodyName = "Body";
+    [SerializeField] private string _taskProgressName = "TaskProgress";
 
     [Header("Button names")]
     [SerializeField] private string _nextButtonName = "Next";
@@ -16,6 +17,7 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
 
     private TextElement _title;
     private TextElement _body;
+    private TextElement _taskProgress;
     private Button _nextButton;
     private Button _retryButton;
     private Button _menuButton;
@@ -40,6 +42,7 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
 
         _title = FindText(root, _titleName);
         _body = FindText(root, _bodyName);
+        _taskProgress = FindText(root, _taskProgressName);
         _nextButton = FindButton(root, _nextButtonName);
         _retryButton = FindButton(root, _retryButtonName);
         _menuButton = FindButton(root, _menuButtonName);
@@ -56,6 +59,11 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
 
         if (_body != null)
             _body.text = LevelResultsController.BuildBody(snapshot);
+
+        if (_taskProgress != null)
+            _taskProgress.text = LevelResultsController.BuildGoalProgressText(
+                snapshot.GoalLines
+            );
 
         SetVisible(
             _nextButton,
