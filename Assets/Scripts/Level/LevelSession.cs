@@ -8,7 +8,7 @@ public class LevelSession : MonoBehaviour
     [SerializeField] private PipelineController _pipeline;
     [SerializeField] private PipelineSpawner _spawner;
     [SerializeField] private GameStateManager _gameState;
-    [SerializeField] private LevelResultsScreen _resultsScreen;
+    [SerializeField] private LevelResultsController _resultsController;
     [SerializeField] private LevelMenuController _menuController;
     [SerializeField] private LevelPauseController _pauseController;
 
@@ -44,6 +44,8 @@ public class LevelSession : MonoBehaviour
             _spawner = FindAnyObjectByType<PipelineSpawner>();
         if (_gameState == null)
             _gameState = FindAnyObjectByType<GameStateManager>();
+        if (_resultsController == null)
+            _resultsController = FindAnyObjectByType<LevelResultsController>();
         if (_menuController == null)
             _menuController = FindAnyObjectByType<LevelMenuController>();
         if (_pauseController == null)
@@ -144,7 +146,7 @@ public class LevelSession : MonoBehaviour
         ClearPauseState();
         _levelEnded = true;
         _activeConfig = null;
-        _resultsScreen?.HideImmediate();
+        _resultsController?.HideImmediate();
         _inspector?.SetLevelEnded(true);
         _pipeline?.StopPipeline();
         _pauseController?.HideAll();
@@ -170,7 +172,7 @@ public class LevelSession : MonoBehaviour
         _activeConfig = _database.Levels[_levelIndex];
         _levelEnded = false;
 
-        _resultsScreen?.HideImmediate();
+        _resultsController?.HideImmediate();
         _menuController?.HideAll();
         _pauseController?.HideAll();
 
@@ -307,9 +309,9 @@ public class LevelSession : MonoBehaviour
                 _inspector != null ? _inspector.RageModeCount : 0
             );
 
-        if (_resultsScreen != null)
+        if (_resultsController != null)
         {
-            _resultsScreen.Show(
+            _resultsController.Show(
                 snapshot,
                 HasNextLevel,
                 StartNextLevel,
@@ -319,10 +321,9 @@ public class LevelSession : MonoBehaviour
         }
         else
         {
-            Debug.Log(
-                "[LevelSession] Level ended without results screen."
+            Debug.LogError(
+                "[LevelSession] Level ended without results controller."
             );
-            ReturnToMenu();
         }
     }
 }

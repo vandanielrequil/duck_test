@@ -38,9 +38,7 @@ public abstract class LevelPauseFacadeBase : MonoBehaviour, ILevelPauseFacade
 public class LevelPauseController : MonoBehaviour, ILevelPauseActions
 {
     [SerializeField] private LevelSession _levelSession;
-    [SerializeField] private MonoBehaviour _pauseFacadeBehaviour;
-
-    private ILevelPauseFacade _pauseFacade;
+    [SerializeField] private LevelPauseFacadeBase _pauseFacade;
 
     private void Awake()
     {
@@ -101,17 +99,7 @@ public class LevelPauseController : MonoBehaviour, ILevelPauseActions
 
     private void ResolveFacade()
     {
-        if (_pauseFacadeBehaviour == null)
-            _pauseFacadeBehaviour = FindAnyObjectByType<LevelPauseFacadeBase>();
-
-        _pauseFacade = _pauseFacadeBehaviour as ILevelPauseFacade;
-
-        if (_pauseFacadeBehaviour != null && _pauseFacade == null)
-        {
-            Debug.LogError(
-                "[LevelPauseController] Pause facade behaviour must implement "
-                + nameof(ILevelPauseFacade)
-            );
-        }
+        if (_pauseFacade == null)
+            _pauseFacade = FindAnyObjectByType<LevelPauseFacadeBase>();
     }
 }

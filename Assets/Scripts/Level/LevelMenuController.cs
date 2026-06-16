@@ -48,9 +48,7 @@ public abstract class LevelMenuFacadeBase : MonoBehaviour, ILevelMenuFacade
 public class LevelMenuController : MonoBehaviour, ILevelMenuActions
 {
     [SerializeField] private LevelSession _levelSession;
-    [SerializeField] private MonoBehaviour _menuFacadeBehaviour;
-
-    private ILevelMenuFacade _menuFacade;
+    [SerializeField] private LevelMenuFacadeBase _menuFacade;
 
     private void Awake()
     {
@@ -143,17 +141,7 @@ public class LevelMenuController : MonoBehaviour, ILevelMenuActions
 
     private void ResolveFacade()
     {
-        if (_menuFacadeBehaviour == null)
-            _menuFacadeBehaviour = FindAnyObjectByType<LevelMenuFacadeBase>();
-
-        _menuFacade = _menuFacadeBehaviour as ILevelMenuFacade;
-
-        if (_menuFacadeBehaviour != null && _menuFacade == null)
-        {
-            Debug.LogError(
-                "[LevelMenuController] Menu facade behaviour must implement "
-                + nameof(ILevelMenuFacade)
-            );
-        }
+        if (_menuFacade == null)
+            _menuFacade = FindAnyObjectByType<LevelMenuFacadeBase>();
     }
 }
