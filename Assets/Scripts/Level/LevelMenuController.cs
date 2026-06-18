@@ -78,6 +78,7 @@ public class LevelMenuController : MonoBehaviour, ILevelMenuActions
     public void NewGame()
     {
         HideAll();
+        PlayerProgress.ResetCampaign(_levelSession?.Database);
         Debug.Log("New game requested");
         _levelSession?.StartLevel(0);
     }

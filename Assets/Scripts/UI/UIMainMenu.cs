@@ -7,6 +7,7 @@ public class UIMainMenu : LevelMenuFacadeBase
 {
     [SerializeField] private UIDocument _document;
     [SerializeField] private UIDocument _loadLevelDocument;
+    [SerializeField] private LevelSession _levelSession;
 
     [Header("Layout names")]
     [SerializeField] private string _mainMenuName = "MainMenu";
@@ -17,7 +18,7 @@ public class UIMainMenu : LevelMenuFacadeBase
     [SerializeField] private string _newGameButtonName = "NewGameButton";
     [SerializeField] private string _continueButtonName = "ContinueButton";
     [Space(6)]
-    [SerializeField] private string _loadLevelButtonName = "LoadLevel";
+    [SerializeField] private string _loadLevelButtonName = "LoadLevelButton";
     [SerializeField] private string _optionsButtonName = "OptionsButton";
     [SerializeField] private string _exitGameButtonName = "ExitGameButton";
     [SerializeField] private string _credentialsButtonName = "CredentialsButton";
@@ -42,6 +43,9 @@ public class UIMainMenu : LevelMenuFacadeBase
 
     private void Awake()
     {
+        if (_levelSession == null)
+            _levelSession = FindAnyObjectByType<LevelSession>();
+
         if (_document != null)
             UseDocument(_document);
 
@@ -96,6 +100,7 @@ public class UIMainMenu : LevelMenuFacadeBase
         ShowMainDocument();
         HideLayouts();
         Show(_mainMenu);
+        RefreshMainMenuState();
     }
 
     public override void ShowLoadLevel()
@@ -103,6 +108,7 @@ public class UIMainMenu : LevelMenuFacadeBase
         HideMainDocument();
         ShowLoadLevelDocument();
         HideLayouts();
+        RefreshLevelButtons();
     }
 
     public override void ShowOptions()
@@ -178,10 +184,11 @@ public class UIMainMenu : LevelMenuFacadeBase
             if (!TryGetLevelIndex(button.name, out int levelIndex))
                 continue;
 
+            string label = button.text;
             Action callback = () => LoadLevel(levelIndex);
             button.clicked += callback;
             _levelButtonBindings.Add(
-                new LevelButtonBinding(button, callback)
+                new LevelButtonBinding(button, callback, levelIndex, label)
             );
         }
     }
@@ -243,6 +250,8 @@ public class UIMainMenu : LevelMenuFacadeBase
 
         if (_levelButtonBindings.Count == 0)
             UseLoadLevelDocument(_loadLevelDocument);
+
+        RefreshLevelButtons();
     }
 
     private void HideLoadLevelDocument()
@@ -285,15 +294,54 @@ public class UIMainMenu : LevelMenuFacadeBase
             element.style.display = DisplayStyle.None;
     }
 
+    private void RefreshMainMenuState()
+    {
+        bool hasSave = PlayerProgress.HasSaveData();
+
+        if (_continueButton != null)
+            SetVisible(_continueButton, hasSave);
+    }
+
+    private void RefreshLevelButtons()
+    {
+        foreach (LevelButtonBinding binding in _levelButtonBindings)
+        {
+            bool unlocked = _levelSession == null
+                || _levelSession.IsLevelUnlocked(binding.LevelIndex);
+
+            binding.Button.SetEnabled(unlocked);
+            binding.Button.text = unlocked
+                ? binding.Label
+                : $"{binding.Label}\n(Locked)";
+        }
+    }
+
+    private static void SetVisible(VisualElement element, bool visible)
+    {
+        if (element != null)
+            element.style.display = visible
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+    }
+
     private readonly struct LevelButtonBinding
     {
         public readonly Button Button;
         public readonly Action Callback;
+        public readonly int LevelIndex;
+        public readonly string Label;
 
-        public LevelButtonBinding(Button button, Action callback)
+        public LevelButtonBinding(
+            Button button,
+            Action callback,
+            int levelIndex,
+            string label
+        )
         {
             Button = button;
             Callback = callback;
+            LevelIndex = levelIndex;
+            Label = label ?? string.Empty;
         }
     }
 }

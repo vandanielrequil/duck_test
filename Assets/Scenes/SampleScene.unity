@@ -976,7 +976,7 @@ MonoBehaviour:
   _menuController: {fileID: 990001007}
   _pauseController: {fileID: 990001008}
   _autoStartLevelForDebug: 0
-  _ignoreSaveForTesting: 1
+  _ignoreSaveForTesting: 0
   _debugStartLevelIndex: 0
 --- !u!114 &990001007
 MonoBehaviour:

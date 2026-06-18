@@ -1,8 +1,11 @@
+using UnityEngine;
+
 public interface IProgressStore
 {
     int CurrentLevelIndex { get; set; }
     bool IsLevelCompleted(string levelId);
     void CompleteLevel(string levelId, int nextLevelIndex);
+    void ResetCampaign(string[] levelIds);
 }
 
 public static class PlayerProgress
@@ -26,6 +29,26 @@ public static class PlayerProgress
 
     public static void CompleteLevel(string levelId, int nextLevelIndex) =>
         _store.CompleteLevel(levelId, nextLevelIndex);
+
+    public static bool HasSaveData() => CurrentLevelIndex > 0;
+
+    public static void ResetCampaign(LevelDatabase database)
+    {
+        if (database?.Levels == null || database.Levels.Length == 0)
+        {
+            _store.ResetCampaign(System.Array.Empty<string>());
+            return;
+        }
+
+        var levelIds = new string[database.Levels.Length];
+        for (int i = 0; i < database.Levels.Length; i++)
+        {
+            LevelConfig level = database.Levels[i];
+            levelIds[i] = level != null ? level.LevelId : string.Empty;
+        }
+
+        _store.ResetCampaign(levelIds);
+    }
 }
 
 public class PlayerPrefsProgressStore : IProgressStore
@@ -35,35 +58,42 @@ public class PlayerPrefsProgressStore : IProgressStore
 
     public int CurrentLevelIndex
     {
-        get => UnityEngine.PlayerPrefs.GetInt(KeyHighestIndex, 0);
+        get => PlayerPrefs.GetInt(KeyHighestIndex, 0);
         set
         {
-            UnityEngine.PlayerPrefs.SetInt(KeyHighestIndex, value);
-            UnityEngine.PlayerPrefs.Save();
+            PlayerPrefs.SetInt(KeyHighestIndex, value);
+            PlayerPrefs.Save();
         }
     }
 
     public bool IsLevelCompleted(string levelId) =>
         !string.IsNullOrEmpty(levelId)
-        && UnityEngine.PlayerPrefs.GetInt(
-            KeyCompletedPrefix + levelId,
-            0
-        ) == 1;
+        && PlayerPrefs.GetInt(KeyCompletedPrefix + levelId, 0) == 1;
 
     public void CompleteLevel(string levelId, int nextLevelIndex)
     {
         if (!string.IsNullOrEmpty(levelId))
         {
-            UnityEngine.PlayerPrefs.SetInt(
-                KeyCompletedPrefix + levelId,
-                1
-            );
+            PlayerPrefs.SetInt(KeyCompletedPrefix + levelId, 1);
         }
 
-        CurrentLevelIndex = UnityEngine.Mathf.Max(
-            CurrentLevelIndex,
-            nextLevelIndex
-        );
-        UnityEngine.PlayerPrefs.Save();
+        CurrentLevelIndex = Mathf.Max(CurrentLevelIndex, nextLevelIndex);
+        PlayerPrefs.Save();
+    }
+
+    public void ResetCampaign(string[] levelIds)
+    {
+        PlayerPrefs.DeleteKey(KeyHighestIndex);
+
+        if (levelIds != null)
+        {
+            foreach (string levelId in levelIds)
+            {
+                if (!string.IsNullOrEmpty(levelId))
+                    PlayerPrefs.DeleteKey(KeyCompletedPrefix + levelId);
+            }
+        }
+
+        PlayerPrefs.Save();
     }
 }
