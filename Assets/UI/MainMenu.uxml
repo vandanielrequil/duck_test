@@ -1,8 +1,11 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:GroupBox style="height: 266px; align-items: center; justify-content: space-around;">
-        <ui:Button text="New game" name="NewGameButton" style="height: 37px; width: 173px; -unity-text-align: middle-center; white-space: nowrap; justify-content: flex-start; align-items: auto; align-self: center; top: auto;"/>
-        <ui:Button text="Continue" name="ContinueButton" style="height: 37px; width: 173px; -unity-text-align: middle-center; white-space: nowrap; justify-content: flex-start; align-items: auto; align-self: center; top: auto;"/>
-        <ui:Button text="Load level" name="LoadLevelButton" parse-escape-sequences="false" style="height: 37px; width: 173px; -unity-text-align: middle-center; white-space: nowrap; justify-content: flex-start; align-items: auto; align-self: center; top: auto;"/>
-        <ui:Button text="Exit&#10;" name="ExitGameButton" style="justify-content: flex-start; align-items: auto; align-self: center; align-content: auto; bottom: auto; width: 180px;"/>
-    </ui:GroupBox>
+    <ui:VisualElement style="position: absolute; left: 0; top: 0; right: 0; bottom: 1px; align-items: center; justify-content: center;">
+        <ui:GroupBox style="width: 80%; max-width: 520px; align-items: center; justify-content: center;">
+            <ui:Button text="New game" name="NewGameButton" style="height: 34px; width: 249px; margin: 6px 0; font-size: 22px; -unity-text-align: middle-center; white-space: nowrap;"/>
+            <ui:Button text="Continue" name="ContinueButton" style="height: 33px; width: 249px; margin: 6px 0; font-size: 22px; -unity-text-align: middle-center; white-space: nowrap;"/>
+            <ui:Button text="Load level" name="LoadLevelButton" parse-escape-sequences="false" style="height: 32px; width: 249px; margin: 6px 0; font-size: 22px; -unity-text-align: middle-center; white-space: nowrap;"/>
+            <ui:Button text="Core Settings" name="CoreSettingsButton" style="height: 34px; width: 249px; margin: 6px 0; font-size: 22px; -unity-text-align: middle-center; white-space: nowrap;"/>
+            <ui:Button text="Exit" name="ExitGameButton" style="height: 36px; width: 249px; margin: 6px 0; font-size: 22px; -unity-text-align: middle-center; white-space: nowrap;"/>
+        </ui:GroupBox>
+    </ui:VisualElement>
 </ui:UXML>

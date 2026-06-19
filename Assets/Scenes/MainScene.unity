@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &18157197
 Transform:
   m_ObjectHideFlags: 0
@@ -259,7 +259,7 @@ MonoBehaviour:
   MoveInterval: 1.5
   _gameState: {fileID: 990001003}
   _spawner: {fileID: 1560194825}
-  _homerunBeyondSpacing: 1
+  HomerunBeyondSpacing: 1
   InteractionResolver: {fileID: 394857855}
 --- !u!4 &159366670
 Transform:
@@ -484,6 +484,7 @@ MonoBehaviour:
   _document: {fileID: 538797625}
   _titleName: Title
   _bodyName: Body
+  _taskProgressName: TaskProgress
   _nextButtonName: Next
   _retryButtonName: Retry
   _menuButtonName: Menu
@@ -594,7 +595,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &321906089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -709,6 +710,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PipelineInteractionResolver
   _pipeline: {fileID: 159366669}
+  BounceDelay: 0.35
 --- !u!4 &394857856
 Transform:
   m_ObjectHideFlags: 0
@@ -877,7 +879,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &538797624
 Transform:
   m_ObjectHideFlags: 0
@@ -932,7 +934,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &618609591
 Transform:
   m_ObjectHideFlags: 0
@@ -1147,6 +1149,75 @@ Transform:
   m_Children: []
   m_Father: {fileID: 159366670}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &956675218
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 956675221}
+  - component: {fileID: 956675220}
+  - component: {fileID: 956675219}
+  m_Layer: 0
+  m_Name: 'CoreSettingsUI '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &956675219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956675218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIAllParams
+  _document: {fileID: 956675220}
+--- !u!114 &956675220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956675218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 62a93875637bc944c83614a1b589aa56, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8, type: 3}
+  m_SortingOrder: 0
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!4 &956675221
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956675218}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &990001001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1226,6 +1297,7 @@ MonoBehaviour:
   _pipeline: {fileID: 159366669}
   _gameState: {fileID: 990001003}
   _levelManager: {fileID: 990001004}
+  InspectionDurationOverride: -1
 --- !u!114 &990001006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1263,7 +1335,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelMenuController
   _levelSession: {fileID: 990001006}
-  _menuFacade: {fileID: 0}
+  _menuFacade: {fileID: 1717389531}
 --- !u!114 &990001008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1277,8 +1349,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelPauseController
   _levelSession: {fileID: 990001006}
-  _inspector: {fileID: 0}
-  _pauseFacade: {fileID: 0}
+  _inspector: {fileID: 1825136871}
+  _pauseFacade: {fileID: 1452201646}
 --- !u!114 &990001009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1340,9 +1412,9 @@ MonoBehaviour:
   _pipeline: {fileID: 159366669}
   _camera: {fileID: 519420031}
   _gameState: {fileID: 990001003}
-  _flightTimePerSlot: 0.2
-  _minFlightTime: 0.2
-  _arcPerSlot: 0.4
+  FlightTimePerSlot: 0.2
+  MinFlightTime: 0.2
+  ArcPerSlot: 0.4
 --- !u!1 &1390677733
 GameObject:
   m_ObjectHideFlags: 0
@@ -1359,7 +1431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1390677734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1537,8 +1609,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIPauseMenu
   _gameHudDocument: {fileID: 321906089}
   _pauseMenuDocument: {fileID: 618609592}
+  _levelManager: {fileID: 990001004}
   _pauseButtonName: PauseButton
   _rageBarName: RageBar
+  _taskProgressName: TaskProgress
   _resumeButtonName: Continue
   _restartButtonName: Restart
   _menuButtonName: Menu
@@ -1573,7 +1647,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PipelineSpawner
   _pipeline: {fileID: 159366669}
   _objectPrefab: {fileID: 4669166160011835537, guid: ce457221e537c1149ac774bc2c72e696, type: 3}
-  _spawnOffset: 2
+  SpawnOffset: 2
 --- !u!4 &1560194826
 Transform:
   m_ObjectHideFlags: 0
@@ -1620,6 +1694,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIMainMenu
   _document: {fileID: 1390677734}
   _loadLevelDocument: {fileID: 18157198}
+  _levelSession: {fileID: 990001006}
+  _coreSettings: {fileID: 956675219}
   _mainMenuName: MainMenu
   _optionsName: Options
   _credentialsName: Credentials
@@ -1629,6 +1705,7 @@ MonoBehaviour:
   _optionsButtonName: OptionsButton
   _exitGameButtonName: ExitGameButton
   _credentialsButtonName: CredentialsButton
+  _coreSettingsButtonName: CoreSettingsButton
   _levelButtonPrefix: Level_
   _levelNumberToIndexOffset: 1
 --- !u!4 &1717389532
@@ -1802,6 +1879,7 @@ MonoBehaviour:
   _pipeline: {fileID: 159366669}
   _gameState: {fileID: 990001003}
   _levelManager: {fileID: 990001004}
+  InspectionDurationOverride: -1
 --- !u!1 &1974584702
 GameObject:
   m_ObjectHideFlags: 0
@@ -1847,3 +1925,4 @@ SceneRoots:
   - {fileID: 1825136868}
   - {fileID: 159366670}
   - {fileID: 990001002}
+  - {fileID: 956675221}

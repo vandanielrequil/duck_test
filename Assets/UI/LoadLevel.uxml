@@ -1,6 +1,8 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:GroupBox style="height: 100px; flex-direction: row; align-items: auto; align-self: center;">
-        <ui:Button text="Level 1" name="Level_1" style="align-self: center; height: 36px; width: 96px; justify-content: flex-start; flex-direction: row; flex-wrap: nowrap; -unity-text-align: lower-center; white-space: pre-wrap; text-overflow: ellipsis; align-items: auto; align-content: auto;"/>
-        <ui:Button text="Level 2" name="Level_2" style="align-self: center; height: 36px; width: 96px; justify-content: flex-start; flex-direction: row; flex-wrap: nowrap; -unity-text-align: lower-center; white-space: pre-wrap; text-overflow: ellipsis; align-items: auto;"/>
-    </ui:GroupBox>
+    <ui:VisualElement style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; align-items: center; justify-content: center;">
+        <ui:GroupBox style="flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center;">
+            <ui:Button text="Level 1" name="Level_1" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 2" name="Level_2" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+        </ui:GroupBox>
+    </ui:VisualElement>
 </ui:UXML>

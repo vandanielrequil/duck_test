@@ -26,16 +26,16 @@ MonoBehaviour:
   - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
   - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
   Goals:
-  - Type: 2
-    ApproveTarget: {fileID: 0}
+  - Type: 0
+    ApproveTarget: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
     TargetArchetype: 0
     RequiredTags: 0
     MinDuckiness: 3
     MergeInputA: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
-    MergeInputB: {fileID: 11400000, guid: 1b8318b07068ab441a2583010a621f55, type: 2}
+    MergeInputB: {fileID: 0}
     MergeResult: {fileID: 0}
-    RequiredAmount: 1
-    Description: Merge Croc + Beak
+    RequiredAmount: 3
+    Description: Approve One Duck
   BaseInspectionDuration: 3
   AngerThresholdTier1: 3
   AngerThresholdTier2: 6
