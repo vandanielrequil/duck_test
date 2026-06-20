@@ -102,16 +102,62 @@ public class InspectorController : MonoBehaviour
             + $"-> {outcome}, anger+={angerDelta}, tier={_anger.Tier}"
         );
 
-        if (obj.CurrentSlot != null)
-            obj.CurrentSlot.ClearOccupant();
-
-        Destroy(obj.gameObject);
+        BeginEject(obj);
 
         if (_pipeline != null && !_levelEnded)
             _pipeline.IsPaused = false;
 
         _inspectionRoutine = null;
         onComplete?.Invoke();
+    }
+
+    private void BeginEject(PipeObject obj)
+    {
+        if (obj == null)
+            return;
+
+        PipeSlot ejectSlot = _pipeline != null
+            ? _pipeline.GetEjectSlot()
+            : null;
+
+        if (ejectSlot == null)
+        {
+            Destroy(obj.gameObject);
+            return;
+        }
+
+        if (obj.CurrentSlot != null)
+            obj.CurrentSlot.ClearOccupant();
+
+        obj.OnEject();
+        obj.MoveTo(ejectSlot.transform.position);
+
+        StartCoroutine(
+            DestroyAfterEject(obj, ejectSlot.transform.position)
+        );
+    }
+
+    private IEnumerator DestroyAfterEject(PipeObject obj, Vector3 target)
+    {
+        const float arriveDistance = 0.05f;
+        const float maxWait = 3f;
+        float elapsed = 0f;
+
+        while (elapsed < maxWait)
+        {
+            if (obj == null)
+                yield break;
+
+            if (Vector2.Distance(obj.transform.position, target)
+                <= arriveDistance)
+                break;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (obj != null)
+            Destroy(obj.gameObject);
     }
 
     private float GetInspectionDuration()

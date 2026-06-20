@@ -22,7 +22,7 @@ MonoBehaviour:
   FakePaintKitVisualPrefab: {fileID: 1899981239418425701, guid: 4faae68a0621be64e8293b3147bb2573, type: 3}
   BaseDuckiness: 0
   ModifierType: 0
-  FollowSpeed: 8
+  FollowSpeed: 1
   Weight: 1
   FlightSpeedMultiplier: 1
   FlightArcMultiplier: 1

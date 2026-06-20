@@ -6,6 +6,8 @@ using UnityEngine;
 public class PipelineController : MonoBehaviour, IPipelineControl
 {
     [SerializeField] private List<PipeSlot> _slots = new();
+    [Tooltip("Slot index where inspection starts. Slot 0 stays empty (e.g. off-screen).")]
+    [SerializeField] private int _inspectionSlotIndex = 1;
     public float MoveInterval = 1.5f;
     public bool IsPaused { get; set; }
     [SerializeField] private GameStateManager _gameState;
@@ -120,35 +122,60 @@ public class PipelineController : MonoBehaviour, IPipelineControl
         if (_slots == null || _slots.Count == 0)
             return;
 
-        PipeObject removed = _slots[0].OccupiedObject;
+        int inspectIndex = GetInspectionSlotIndex();
+        PipeObject toInspect = _slots[inspectIndex].OccupiedObject;
 
-        List<PipeObject> shifted = new();
+        if (toInspect != null)
+            _slots[inspectIndex].ClearOccupant();
 
-        for (int i = 1; i < _slots.Count; i++)
-            shifted.Add(_slots[i].OccupiedObject);
+        ShiftSlotsTowardInspector(inspectIndex);
 
-        shifted.Add(null);
-
-        for (int i = 0; i < _slots.Count; i++)
-            _slots[i].SetOccupant(shifted[i]);
-
-        _slots[^1].ClearOccupant();
-
-        if (removed != null)
+        if (toInspect != null)
         {
             if (_inspector != null)
             {
                 _inspector.BeginInspection(
-                    removed,
+                    toInspect,
                     CompleteTickAfterInspection
                 );
                 return;
             }
 
-            Destroy(removed.gameObject);
+            Destroy(toInspect.gameObject);
         }
 
         CompleteTick();
+    }
+
+    private int GetInspectionSlotIndex()
+    {
+        if (_slots == null || _slots.Count == 0)
+            return 0;
+
+        return Mathf.Clamp(_inspectionSlotIndex, 0, _slots.Count - 1);
+    }
+
+    public PipeSlot GetEjectSlot()
+    {
+        if (_slots == null || _slots.Count == 0)
+            return null;
+
+        int ejectIndex = GetInspectionSlotIndex() - 1;
+        if (ejectIndex < 0)
+            return null;
+
+        return _slots[ejectIndex];
+    }
+
+    private void ShiftSlotsTowardInspector(int inspectIndex)
+    {
+        for (int i = inspectIndex; i < _slots.Count - 1; i++)
+            _slots[i].SetOccupant(_slots[i + 1].OccupiedObject);
+
+        _slots[^1].ClearOccupant();
+
+        for (int i = 0; i < inspectIndex; i++)
+            _slots[i].ClearOccupant();
     }
 
     private void CompleteTickAfterInspection() => CompleteTick();

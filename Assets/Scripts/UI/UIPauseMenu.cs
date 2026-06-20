@@ -86,7 +86,7 @@ public class UIPauseMenu : LevelPauseFacadeBase
         _pauseMenuDocument = document;
         VisualElement root = GetRoot(_pauseMenuDocument);
         _resumeButton = FindButton(root, _resumeButtonName, "Resume");
-        _restartButton = FindButton(root, _restartButtonName);
+        _restartButton = FindButton(root, _restartButtonName, "Retry");
         _menuButton = FindButton(root, _menuButtonName);
 
         BindPauseMenuButtons();
