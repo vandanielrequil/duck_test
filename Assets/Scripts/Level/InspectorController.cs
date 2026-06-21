@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface IPipelineControl
@@ -14,6 +15,7 @@ public class InspectorController : MonoBehaviour
     [SerializeField] private LevelManager _levelManager;
 
     private readonly InspectorAngerState _anger = new();
+    private readonly List<PipeObject> _managedObjects = new();
     private LevelConfig _config;
     private Coroutine _inspectionRoutine;
     private bool _levelEnded;
@@ -46,6 +48,7 @@ public class InspectorController : MonoBehaviour
         bool levelEnded = false
     )
     {
+        CancelInspection();
         _config = config;
         _levelManager = levelManager;
         _levelEnded = levelEnded;
@@ -54,6 +57,26 @@ public class InspectorController : MonoBehaviour
     }
 
     public void SetLevelEnded(bool ended) => _levelEnded = ended;
+
+    public void CancelInspection()
+    {
+        StopAllCoroutines();
+        _inspectionRoutine = null;
+
+        for (int i = _managedObjects.Count - 1; i >= 0; i--)
+        {
+            PipeObject obj = _managedObjects[i];
+            if (obj == null)
+                continue;
+
+            if (obj.CurrentSlot != null)
+                obj.CurrentSlot.ClearOccupant();
+
+            Destroy(obj.gameObject);
+        }
+
+        _managedObjects.Clear();
+    }
 
     public void BeginInspection(
         PipeObject obj,
@@ -68,6 +91,9 @@ public class InspectorController : MonoBehaviour
 
         if (_inspectionRoutine != null)
             StopCoroutine(_inspectionRoutine);
+
+        if (!_managedObjects.Contains(obj))
+            _managedObjects.Add(obj);
 
         _inspectionRoutine =
             StartCoroutine(InspectionRoutine(obj, onComplete));
@@ -122,6 +148,7 @@ public class InspectorController : MonoBehaviour
 
         if (ejectSlot == null)
         {
+            _managedObjects.Remove(obj);
             Destroy(obj.gameObject);
             return;
         }
@@ -155,6 +182,8 @@ public class InspectorController : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+
+        _managedObjects.Remove(obj);
 
         if (obj != null)
             Destroy(obj.gameObject);

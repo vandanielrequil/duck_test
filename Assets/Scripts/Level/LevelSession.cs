@@ -150,6 +150,7 @@ public class LevelSession : MonoBehaviour
         _activeConfig = null;
         _resultsController?.HideImmediate();
         _inspector?.SetLevelEnded(true);
+        _inspector?.CancelInspection();
         _pipeline?.StopPipeline();
         _pauseController?.HideAll();
 

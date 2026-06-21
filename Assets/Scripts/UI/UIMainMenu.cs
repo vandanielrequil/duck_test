@@ -248,16 +248,38 @@ public class UIMainMenu : LevelMenuFacadeBase
         if (!_loadLevelDocument.gameObject.activeSelf)
             _loadLevelDocument.gameObject.SetActive(true);
 
-        if (_levelButtonBindings.Count == 0)
-            UseLoadLevelDocument(_loadLevelDocument);
-
+        // Re-bind on every show: deactivating the UIDocument rebuilds its
+        // visual tree, orphaning previously bound level buttons. The tree may
+        // also be rebuilt at end of frame, so rebind again via schedule.
+        UseLoadLevelDocument(_loadLevelDocument);
         RefreshLevelButtons();
+        ScheduleLoadLevelRebind();
     }
 
     private void HideLoadLevelDocument()
     {
         if (_loadLevelDocument != null)
             _loadLevelDocument.gameObject.SetActive(false);
+    }
+
+    private void ScheduleLoadLevelRebind()
+    {
+        VisualElement root = _loadLevelDocument != null
+            ? _loadLevelDocument.rootVisualElement
+            : null;
+
+        if (root == null)
+            return;
+
+        root.schedule.Execute(() =>
+        {
+            if (_loadLevelDocument == null
+                || !_loadLevelDocument.gameObject.activeSelf)
+                return;
+
+            UseLoadLevelDocument(_loadLevelDocument);
+            RefreshLevelButtons();
+        }).ExecuteLater(0);
     }
 
     private static VisualElement FindElement(
