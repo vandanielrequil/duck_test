@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Level_02
   m_EditorClassIdentifier: Assembly-CSharp::LevelConfig
   LevelId: level_01
-  DisplayName: First Duck
+  DisplayName: First Croc
   MoveInterval: 1.5
   SpawnQueue:
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
   - Object: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
-  SpawnSlotIndex: 2
+  QueueStartSlotIndex: 4
   Goals:
   - Type: 0
     ApproveTarget: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}

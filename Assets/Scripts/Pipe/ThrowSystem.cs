@@ -78,7 +78,7 @@ public class ThrowSystem : MonoBehaviour
         if (obj == null || _pipeline == null || obj.CurrentSlot == null)
             return false;
 
-        int slotsToFly = GetWeight(obj);
+        int slotsToFly = GetWeight(obj) * GetThrowDirection(obj);
         PipeSlot targetSlot = _pipeline.GetSlotAtOffset(obj, slotsToFly);
 
         if (targetSlot == null || targetSlot == obj.CurrentSlot)
@@ -86,7 +86,7 @@ public class ThrowSystem : MonoBehaviour
 
         _pipeline.IsPaused = true;
         _flightRoutine = StartCoroutine(
-            FlyToSlotRoutine(obj, targetSlot, slotsToFly)
+            FlyToSlotRoutine(obj, targetSlot, Mathf.Abs(slotsToFly))
         );
         return true;
     }
@@ -141,6 +141,11 @@ public class ThrowSystem : MonoBehaviour
 
         _flightRoutine = null;
     }
+
+    // Ducks fly left (toward the inspector, lower slot index); everything
+    // else flies right (toward the tail, higher slot index).
+    private static int GetThrowDirection(PipeObject obj) =>
+        obj?.State?.ObjectData?.Archetype == PipeArchetype.Duck ? -1 : 1;
 
     private static int GetWeight(PipeObject obj) =>
         Mathf.Max(1, obj?.State?.ObjectData?.Weight ?? 1);
