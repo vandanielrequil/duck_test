@@ -10,25 +10,32 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bcde1234abcd5678ef9012345678abcd, type: 3}
-  m_Name: Level_02
+  m_Name: Level_test
   m_EditorClassIdentifier: Assembly-CSharp::LevelConfig
-  LevelId: level_01
-  DisplayName: First Duck
-  MoveInterval: 1.5
+  LevelId: level_02
+  DisplayName: Merge Training
+  MoveInterval: 1.2
   SpawnQueue:
   - Object: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
-  SpawnSlotIndex: 2
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+  - Object: {fileID: 11400000, guid: a716d5199cc754e4b97ac27e489b255c, type: 2}
+  - Object: {fileID: 11400000, guid: a716d5199cc754e4b97ac27e489b255c, type: 2}
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
   Goals:
   - Type: 0
     ApproveTarget: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
     TargetArchetype: 0
     RequiredTags: 0
     MinDuckiness: 3
-    MergeInputA: {fileID: 0}
+    MergeInputA: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
     MergeInputB: {fileID: 0}
     MergeResult: {fileID: 0}
-    RequiredAmount: 1
-    Description: Approve a real duck
+    RequiredAmount: 3
+    Description: Approve One Duck
   BaseInspectionDuration: 3
   AngerThresholdTier1: 3
   AngerThresholdTier2: 6

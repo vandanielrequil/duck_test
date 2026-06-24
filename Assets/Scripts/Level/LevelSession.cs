@@ -182,8 +182,12 @@ public class LevelSession : MonoBehaviour
         _levelManager?.Load(_activeConfig);
         _inspector?.BindLevel(_activeConfig, _levelManager, false);
         _inspector?.SetLevelEnded(false);
-        _spawner?.BindQueue(_activeConfig.SpawnQueue);
+        _spawner?.BindQueue(
+            _activeConfig.SpawnQueue,
+            _activeConfig.QueueStartSlotIndex
+        );
         _pipeline?.ResetForLevel(_activeConfig, _inspector, _spawner);
+        _spawner?.PrefillQueueStart();
 
         if (_gameState != null)
             _gameState.SetState(PipeGameState.Playing);

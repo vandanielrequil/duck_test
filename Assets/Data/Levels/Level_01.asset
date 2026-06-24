@@ -17,6 +17,7 @@ MonoBehaviour:
   MoveInterval: 1.5
   SpawnQueue:
   - Object: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
+  SpawnSlotIndex: 2
   Goals:
   - Type: 0
     ApproveTarget: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}

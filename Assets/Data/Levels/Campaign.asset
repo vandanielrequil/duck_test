@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Campaign
   m_EditorClassIdentifier: Assembly-CSharp::LevelDatabase
   Levels:
-  - {fileID: 11400000, guid: 44445555666677778888999900001111, type: 2}
   - {fileID: 11400000, guid: 33334444555566667777888899990000, type: 2}
+  - {fileID: 11400000, guid: 44445555666677778888999900001111, type: 2}
