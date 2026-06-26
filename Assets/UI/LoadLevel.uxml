@@ -1,8 +1,16 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; align-items: center; justify-content: center;">
-        <ui:GroupBox style="flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center;">
+        <ui:GroupBox style="flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; max-width: 640px;">
             <ui:Button text="Level 1" name="Level_1" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
             <ui:Button text="Level 2" name="Level_2" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 3" name="Level_3" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 4" name="Level_4" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 5" name="Level_5" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 6" name="Level_6" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 7" name="Level_7" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 8" name="Level_8" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 9" name="Level_9" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
+            <ui:Button text="Level 10" name="Level_10" style="height: 96px; width: 140px; margin: 8px; font-size: 20px; -unity-text-align: middle-center; white-space: pre-wrap;"/>
         </ui:GroupBox>
     </ui:VisualElement>
 </ui:UXML>
