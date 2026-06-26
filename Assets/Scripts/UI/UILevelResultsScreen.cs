@@ -9,6 +9,8 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
     [SerializeField] private string _titleName = "Title";
     [SerializeField] private string _bodyName = "Body";
     [SerializeField] private string _taskProgressName = "TaskProgress";
+    [SerializeField] private string _actionsUsedName = "ActionsUsed";
+    [SerializeField] private string _ratingName = "Rating";
 
     [Header("Button names")]
     [SerializeField] private string _nextButtonName = "Next";
@@ -18,6 +20,8 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
     private TextElement _title;
     private TextElement _body;
     private TextElement _taskProgress;
+    private TextElement _actionsUsed;
+    private TextElement _rating;
     private Button _nextButton;
     private Button _retryButton;
     private Button _menuButton;
@@ -43,6 +47,8 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
         _title = FindText(root, _titleName);
         _body = FindText(root, _bodyName);
         _taskProgress = FindText(root, _taskProgressName);
+        _actionsUsed = FindText(root, _actionsUsedName);
+        _rating = FindText(root, _ratingName);
         _nextButton = FindButton(root, _nextButtonName);
         _retryButton = FindButton(root, _retryButtonName);
         _menuButton = FindButton(root, _menuButtonName);
@@ -64,6 +70,13 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
             _taskProgress.text = LevelResultsController.BuildGoalProgressText(
                 snapshot.GoalLines
             );
+
+        if (_actionsUsed != null)
+            _actionsUsed.text = $"Actions: {snapshot.ActionsUsed}";
+
+        if (_rating != null)
+            _rating.text =
+                $"Rating: {LevelResultsController.FormatRating(snapshot.Rating)}";
 
         SetVisible(
             _nextButton,

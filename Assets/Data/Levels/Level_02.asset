@@ -33,8 +33,10 @@ MonoBehaviour:
   BaseInspectionDuration: 3
   AngerThresholdTier1: 3
   AngerThresholdTier2: 6
-  AngerMax: 6
+  AngerMax: 3
   EndRules:
     WinOnPipelineDrained: 1
     WinOnGoalsComplete: 1
     LoseOnRageBarFull: 1
+  MaxActionsForRating3: 1
+  MaxActionsForRating2: 2

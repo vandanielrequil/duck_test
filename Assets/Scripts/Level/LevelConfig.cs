@@ -34,6 +34,34 @@ public class LevelConfig : ScriptableObject
 
     [Header("End rules")]
     public LevelEndRules EndRules = LevelEndRules.Default;
+
+    [Header("Rating (max actions inclusive)")]
+    [Tooltip("3/3 if actions used is at most this value.")]
+    public int MaxActionsForRating3 = 2;
+
+    [Tooltip("2/3 if actions used is at most this value (and above Rating 3). "
+        + "1/3 for anything above.")]
+    public int MaxActionsForRating2 = 4;
+
+    public int ComputeRating(int actionsUsed)
+    {
+        if (actionsUsed <= MaxActionsForRating3)
+            return 3;
+
+        if (actionsUsed <= MaxActionsForRating2)
+            return 2;
+
+        return 1;
+    }
+
+    private void OnValidate()
+    {
+        MaxActionsForRating3 = Mathf.Max(0, MaxActionsForRating3);
+        MaxActionsForRating2 = Mathf.Max(
+            MaxActionsForRating3,
+            MaxActionsForRating2
+        );
+    }
 }
 
 [System.Serializable]

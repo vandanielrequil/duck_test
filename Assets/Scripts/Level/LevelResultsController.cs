@@ -126,6 +126,8 @@ public class LevelResultsController : MonoBehaviour, ILevelResultsActions
         lines.AppendLine(snapshot.LevelName);
         lines.AppendLine($"Reason: {snapshot.Reason}");
         lines.AppendLine($"Approved: {snapshot.ObjectsApproved}");
+        lines.AppendLine($"Actions: {snapshot.ActionsUsed}");
+        lines.AppendLine($"Rating: {FormatRating(snapshot.Rating)}");
         lines.AppendLine();
 
         if (snapshot.GoalLines != null)
@@ -178,6 +180,8 @@ public class LevelResultsController : MonoBehaviour, ILevelResultsActions
 
         return sb.ToString();
     }
+
+    public static string FormatRating(int rating) => $"{rating}/3";
 
     private void ResolveFacade()
     {

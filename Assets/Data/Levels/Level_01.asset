@@ -17,7 +17,7 @@ MonoBehaviour:
   MoveInterval: 1.5
   SpawnQueue:
   - Object: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
-  SpawnSlotIndex: 2
+  QueueStartSlotIndex: 2
   Goals:
   - Type: 0
     ApproveTarget: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
@@ -34,6 +34,8 @@ MonoBehaviour:
   AngerThresholdTier2: 6
   AngerMax: 6
   EndRules:
-    WinOnPipelineDrained: 1
+    WinOnPipelineDrained: 0
     WinOnGoalsComplete: 1
     LoseOnRageBarFull: 1
+  MaxActionsForRating3: 1
+  MaxActionsForRating2: 2

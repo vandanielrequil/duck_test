@@ -44,4 +44,6 @@ public struct LevelResultsSnapshot
     public LevelEndReason Reason;
     public LevelGoalResultLine[] GoalLines;
     public int ObjectsApproved;
+    public int ActionsUsed;
+    public int Rating;
 }

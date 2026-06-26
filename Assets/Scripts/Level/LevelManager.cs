@@ -8,10 +8,12 @@ public class LevelManager : MonoBehaviour
 
     private LevelConfig _config;
     private int _objectsApproved;
+    private int _actionsUsed;
 
     public LevelConfig CurrentConfig => _config;
     public IReadOnlyList<LevelGoalRuntime> Goals => _goals;
     public int ObjectsApproved => _objectsApproved;
+    public int ActionsUsed => _actionsUsed;
 
     public event Action<LevelGoalRuntime> OnGoalProgress;
     public event Action OnAllGoalsComplete;
@@ -20,6 +22,7 @@ public class LevelManager : MonoBehaviour
     {
         _config = config;
         _objectsApproved = 0;
+        _actionsUsed = 0;
         _goals.Clear();
 
         if (config?.Goals == null)
@@ -27,6 +30,14 @@ public class LevelManager : MonoBehaviour
 
         foreach (LevelGoalData goal in config.Goals)
             _goals.Add(new LevelGoalRuntime(goal));
+    }
+
+    public void RegisterAction()
+    {
+        if (_config == null)
+            return;
+
+        _actionsUsed++;
     }
 
     public bool AllGoalsComplete
@@ -136,6 +147,10 @@ public class LevelManager : MonoBehaviour
             Reason = reason,
             GoalLines = lines,
             ObjectsApproved = _objectsApproved,
+            ActionsUsed = _actionsUsed,
+            Rating = outcome == LevelEndOutcome.Success && _config != null
+                ? _config.ComputeRating(_actionsUsed)
+                : 0,
         };
     }
 }

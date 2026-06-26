@@ -7,6 +7,7 @@ public class ThrowSystem : MonoBehaviour
     [SerializeField] private PipelineController _pipeline;
     [SerializeField] private Camera _camera;
     [SerializeField] private GameStateManager _gameState;
+    [SerializeField] private LevelManager _levelManager;
 
     [Header("Flight")]
     [SerializeField] private float _flightTimePerSlot = 0.14f;
@@ -29,6 +30,9 @@ public class ThrowSystem : MonoBehaviour
 
         if (_pipeline == null)
             _pipeline = FindAnyObjectByType<PipelineController>();
+
+        if (_levelManager == null)
+            _levelManager = FindAnyObjectByType<LevelManager>();
     }
 
     private void Update()
@@ -45,7 +49,10 @@ public class ThrowSystem : MonoBehaviour
         );
 
         if (obj != null)
+        {
+            _levelManager?.RegisterAction();
             TryLaunchByWeight(obj);
+        }
     }
 
     private bool IsPlayableState() =>
