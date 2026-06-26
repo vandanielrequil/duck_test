@@ -58,6 +58,84 @@ public class PipelineInteractionResolver : MonoBehaviour
         return kind;
     }
 
+    public bool TryGetDuckPaintSlideContinuation(
+        PipeObject movingObject,
+        PipeSlot landingSlot,
+        int previousSlideHits,
+        out PipeSlot nextSlot,
+        out int flyDistance
+    )
+    {
+        nextSlot = null;
+        flyDistance = 0;
+
+        if (movingObject == null
+            || landingSlot == null
+            || _pipeline == null)
+            return false;
+
+        PipeObject blocker = landingSlot.OccupiedObject;
+        if (blocker == null || blocker == movingObject)
+            return false;
+
+        if (!IsDuckPaintPair(movingObject, blocker))
+            return false;
+
+        flyDistance = previousSlideHits == 0
+            ? GetWeight(movingObject)
+            : 1;
+
+        int direction = GetThrowDirection(movingObject);
+        if (!TryGetSlideTargetSlot(
+                landingSlot.Index,
+                flyDistance,
+                direction,
+                out nextSlot,
+                out flyDistance
+            ))
+            return false;
+
+        Debug.Log(
+            $"Interaction: Duck/Paint slide #{previousSlideHits + 1}, "
+            + $"distance={flyDistance}, direction={direction}"
+        );
+        return true;
+    }
+
+    private bool TryGetSlideTargetSlot(
+        int fromIndex,
+        int requestedDistance,
+        int direction,
+        out PipeSlot targetSlot,
+        out int actualDistance
+    )
+    {
+        targetSlot = null;
+        actualDistance = 0;
+
+        if (_pipeline?.Slots == null || requestedDistance <= 0)
+            return false;
+
+        int slotsCount = _pipeline.Slots.Count;
+        int targetIndex = fromIndex;
+
+        for (int step = 0; step < requestedDistance; step++)
+        {
+            int nextIndex = targetIndex + direction;
+            if (nextIndex < 0 || nextIndex >= slotsCount)
+                break;
+
+            targetIndex = nextIndex;
+            actualDistance++;
+        }
+
+        if (actualDistance <= 0 || targetIndex == fromIndex)
+            return false;
+
+        targetSlot = _pipeline.Slots[targetIndex];
+        return targetSlot != null;
+    }
+
     public InteractionResult ResolveHomerun(
         PipeObject movingObject,
         bool toLeft
@@ -105,6 +183,9 @@ public class PipelineInteractionResolver : MonoBehaviour
             Debug.Log("DetermineInteraction - ShovePair debug");
             return ResolveWeightBased(moving, target);
         }
+
+        if (IsDuckPaintPair(moving, target))
+            return ResolveWeightBased(moving, target);
 
         Debug.Log("DetermineInteraction - Bounce debug");
         return InteractionResult.Bounce;
@@ -178,6 +259,31 @@ public class PipelineInteractionResolver : MonoBehaviour
 
     private static int GetWeight(PipeObject obj) =>
         Mathf.Max(1, obj?.State?.ObjectData?.Weight ?? 1);
+
+    private static int GetThrowDirection(PipeObject obj) =>
+        obj?.State?.ObjectData?.Archetype == PipeArchetype.Duck ? -1 : 1;
+
+    private static bool IsPaint(PipeObject obj) =>
+        obj?.State?.ObjectData?.Archetype == PipeArchetype.Modifier
+        && obj.State.ObjectData.ModifierType == PipeModifierType.Paint;
+
+    private static bool IsDuckPaintPair(
+        PipeObject moving,
+        PipeObject target
+    )
+    {
+        if (moving?.State?.ObjectData == null
+            || target?.State?.ObjectData == null)
+            return false;
+
+        bool movingIsDuck =
+            moving.State.ObjectData.Archetype == PipeArchetype.Duck;
+        bool targetIsDuck =
+            target.State.ObjectData.Archetype == PipeArchetype.Duck;
+
+        return (movingIsDuck && IsPaint(target))
+            || (IsPaint(moving) && targetIsDuck);
+    }
 
     private bool HasEmptySlotBehind(PipeObject target)
     {

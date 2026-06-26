@@ -104,14 +104,68 @@ public class ThrowSystem : MonoBehaviour
         int distanceSlots
     )
     {
-        Vector2 start = obj.transform.position;
-        Vector2 end = targetSlot.transform.position;
-
         if (obj.CurrentSlot != null)
             obj.CurrentSlot.ClearOccupant();
 
         obj.BeginFlight();
 
+        Vector2 start = obj.transform.position;
+        PipeSlot currentTarget = targetSlot;
+        int currentDistance = distanceSlots;
+        int slideHits = 0;
+
+        while (true)
+        {
+            Vector2 end = currentTarget.transform.position;
+
+            yield return FlyArcSegment(
+                obj,
+                start,
+                end,
+                currentDistance
+            );
+
+            if (Resolver != null
+                && Resolver.TryGetDuckPaintSlideContinuation(
+                    obj,
+                    currentTarget,
+                    slideHits,
+                    out PipeSlot nextSlot,
+                    out int nextDistance
+                ))
+            {
+                slideHits++;
+                start = end;
+                currentTarget = nextSlot;
+                currentDistance = nextDistance;
+                continue;
+            }
+
+            obj.SetFlightPosition(end);
+            obj.EndFlight();
+
+            InteractionResult result =
+                Resolver != null
+                    ? Resolver.ResolveInteraction(obj, currentTarget)
+                    : InteractionResult.None;
+
+            _pipeline.MoveOcupasToNewSlot();
+
+            if (result != InteractionResult.Bounce)
+                _pipeline.IsPaused = false;
+
+            _flightRoutine = null;
+            yield break;
+        }
+    }
+
+    private IEnumerator FlyArcSegment(
+        PipeObject obj,
+        Vector2 start,
+        Vector2 end,
+        int distanceSlots
+    )
+    {
         float speed = GetFlightSpeedMultiplier(obj);
         float duration = Mathf.Max(
             _minFlightTime,
@@ -134,19 +188,6 @@ public class ThrowSystem : MonoBehaviour
         }
 
         obj.SetFlightPosition(end);
-        obj.EndFlight();
-
-        InteractionResult result =
-            Resolver != null
-                ? Resolver.ResolveInteraction(obj, targetSlot)
-                : InteractionResult.None;
-
-        _pipeline.MoveOcupasToNewSlot();
-
-        if (result != InteractionResult.Bounce)
-            _pipeline.IsPaused = false;
-
-        _flightRoutine = null;
     }
 
     // Ducks fly left (toward the inspector, lower slot index); everything
