@@ -214,7 +214,7 @@ Transform:
   m_GameObject: {fileID: 141366044}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.06, y: -0.46, z: 0}
+  m_LocalPosition: {x: 5.63, y: -0.67, z: 0}
   m_LocalScale: {x: 1.2121, y: 1.2121, z: 1.2121}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -257,6 +257,7 @@ MonoBehaviour:
   - {fileID: 729423424}
   - {fileID: 141366045}
   - {fileID: 340767267}
+  - {fileID: 2015980823}
   _inspectionSlotIndex: 1
   MoveInterval: 1.5
   _gameState: {fileID: 990001003}
@@ -286,6 +287,7 @@ Transform:
   - {fileID: 729423425}
   - {fileID: 141366046}
   - {fileID: 340767266}
+  - {fileID: 2015980822}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &208440035
@@ -488,6 +490,9 @@ MonoBehaviour:
   _titleName: Title
   _bodyName: Body
   _taskProgressName: TaskProgress
+  _actionsUsedName: ActionsUsed
+  _rageAccumulatedName: RageAccumulated
+  _ratingName: Rating
   _nextButtonName: Next
   _retryButtonName: Retry
   _menuButtonName: Menu
@@ -663,7 +668,7 @@ Transform:
   m_GameObject: {fileID: 340767265}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.61, y: -0.54, z: 0}
+  m_LocalPosition: {x: 7.99, y: -0.72, z: 0}
   m_LocalScale: {x: 1.2121, y: 1.2121, z: 1.2121}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -723,7 +728,7 @@ Transform:
   m_GameObject: {fileID: 342064831}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.52, y: -0.32, z: 0}
+  m_LocalPosition: {x: 0.18, y: -0.66, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1145,7 +1150,7 @@ Transform:
   m_GameObject: {fileID: 729423423}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.31, y: -0.63, z: 0}
+  m_LocalPosition: {x: 3.15, y: -0.66, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1390,6 +1395,7 @@ MonoBehaviour:
   _pipeline: {fileID: 159366669}
   _camera: {fileID: 519420031}
   _gameState: {fileID: 990001003}
+  _levelManager: {fileID: 0}
   _flightTimePerSlot: 0.14
   _minFlightTime: 0.25
   _arcPerSlot: 0.2
@@ -1488,7 +1494,7 @@ Transform:
   m_GameObject: {fileID: 1393585998}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.33, y: -0.71, z: 0}
+  m_LocalPosition: {x: -2.55, y: -0.68, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1534,7 +1540,7 @@ Transform:
   m_GameObject: {fileID: 1403553143}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.62, y: -0.73, z: 0}
+  m_LocalPosition: {x: -5.02, y: -0.82, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1890,6 +1896,52 @@ Transform:
   - {fileID: 1452201645}
   m_Father: {fileID: 990001002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2015980821
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2015980822}
+  - component: {fileID: 2015980823}
+  m_Layer: 0
+  m_Name: Slot7
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2015980822
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2015980821}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10.37, y: -0.72, z: 0}
+  m_LocalScale: {x: 1.2121, y: 1.2121, z: 1.2121}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 159366670}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2015980823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2015980821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4d0e25397ba186f30b7ea69d148f25c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PipeSlot
+  OccupiedObject: {fileID: 0}
+  Index: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

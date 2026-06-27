@@ -10,12 +10,14 @@ public class LevelManager : MonoBehaviour
     private int _objectsApproved;
     private int _actionsUsed;
     private int _rageAccumulated;
+    private int _additionalCompleted;
 
     public LevelConfig CurrentConfig => _config;
     public IReadOnlyList<LevelGoalRuntime> Goals => _goals;
     public int ObjectsApproved => _objectsApproved;
     public int ActionsUsed => _actionsUsed;
     public int RageAccumulated => _rageAccumulated;
+    public int AdditionalCompleted => _additionalCompleted;
 
     public event Action<LevelGoalRuntime> OnGoalProgress;
     public event Action OnAllGoalsComplete;
@@ -26,6 +28,7 @@ public class LevelManager : MonoBehaviour
         _objectsApproved = 0;
         _actionsUsed = 0;
         _rageAccumulated = 0;
+        _additionalCompleted = 0;
         _goals.Clear();
 
         if (config?.Goals == null)
@@ -55,16 +58,18 @@ public class LevelManager : MonoBehaviour
     {
         get
         {
-            if (_goals.Count == 0)
-                return false;
-
+            bool hasRequired = false;
             foreach (LevelGoalRuntime goal in _goals)
             {
+                if (goal.Config.IsAdditional)
+                    continue;
+
+                hasRequired = true;
                 if (!goal.IsComplete)
                     return false;
             }
 
-            return true;
+            return hasRequired;
         }
     }
 
@@ -94,6 +99,9 @@ public class LevelManager : MonoBehaviour
 
             goal.AddProgress();
             OnGoalProgress?.Invoke(goal);
+
+            if (goal.Config.IsAdditional && goal.IsComplete)
+                _additionalCompleted++;
         }
 
         if (AllGoalsComplete)
@@ -109,6 +117,8 @@ public class LevelManager : MonoBehaviour
             if (goal.IsComplete)
                 continue;
 
+            bool matched = false;
+
             if (goal.MatchesMergePair(
                     obj.State?.MergeInputA,
                     obj.State?.MergeInputB
@@ -116,14 +126,19 @@ public class LevelManager : MonoBehaviour
             {
                 goal.AddProgress();
                 OnGoalProgress?.Invoke(goal);
+                matched = true;
                 progress = true;
             }
             else if (goal.MatchesMergeResult(obj.State?.ObjectData))
             {
                 goal.AddProgress();
                 OnGoalProgress?.Invoke(goal);
+                matched = true;
                 progress = true;
             }
+
+            if (matched && goal.Config.IsAdditional && goal.IsComplete)
+                _additionalCompleted++;
         }
 
         if (progress && AllGoalsComplete)
@@ -146,6 +161,7 @@ public class LevelManager : MonoBehaviour
                 Current = goal.Current,
                 Required = goal.Config.RequiredAmount,
                 Complete = goal.IsComplete,
+                IsAdditional = goal.Config.IsAdditional,
             };
         }
 
@@ -160,8 +176,9 @@ public class LevelManager : MonoBehaviour
             ObjectsApproved = _objectsApproved,
             ActionsUsed = _actionsUsed,
             RageAccumulated = _rageAccumulated,
+            AdditionalCompleted = _additionalCompleted,
             Rating = outcome == LevelEndOutcome.Success && _config != null
-                ? _config.ComputeRating(_actionsUsed, _rageAccumulated)
+                ? _config.ComputeRating(_actionsUsed, _rageAccumulated, _additionalCompleted)
                 : 0,
         };
     }

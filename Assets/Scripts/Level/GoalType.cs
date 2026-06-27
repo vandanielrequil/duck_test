@@ -34,6 +34,7 @@ public struct LevelGoalResultLine
     public int Current;
     public int Required;
     public bool Complete;
+    public bool IsAdditional;
 }
 
 [Serializable]
@@ -46,5 +47,6 @@ public struct LevelResultsSnapshot
     public int ObjectsApproved;
     public int ActionsUsed;
     public int RageAccumulated;
+    public int AdditionalCompleted;
     public int Rating;
 }

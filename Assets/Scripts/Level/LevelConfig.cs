@@ -51,12 +51,20 @@ public class LevelConfig : ScriptableObject
         + "1/3 for anything above.")]
     public int MaxRageForRating2 = 2;
 
-    // Final rating = min(actions rating, rage rating).
-    public int ComputeRating(int actionsUsed, int rageAccumulated)
+    [Header("Rating (min additional goals completed)")]
+    [Tooltip("3/3 requires at least this many additional goals completed. 0 = no requirement.")]
+    public int MinAdditionalForRating3 = 0;
+
+    [Tooltip("2/3 requires at least this many additional goals completed. 0 = no requirement.")]
+    public int MinAdditionalForRating2 = 0;
+
+    // Final rating = min(actions rating, rage rating, additional rating).
+    public int ComputeRating(int actionsUsed, int rageAccumulated, int additionalCompleted)
     {
-        int actionsRating = ComputeActionsRating(actionsUsed);
-        int rageRating    = ComputeRageRating(rageAccumulated);
-        return Mathf.Min(actionsRating, rageRating);
+        int actionsRating    = ComputeActionsRating(actionsUsed);
+        int rageRating       = ComputeRageRating(rageAccumulated);
+        int additionalRating = ComputeAdditionalRating(additionalCompleted);
+        return Mathf.Min(actionsRating, Mathf.Min(rageRating, additionalRating));
     }
 
     private int ComputeActionsRating(int actionsUsed)
@@ -73,6 +81,13 @@ public class LevelConfig : ScriptableObject
         return 1;
     }
 
+    private int ComputeAdditionalRating(int additionalCompleted)
+    {
+        if (additionalCompleted >= MinAdditionalForRating3) return 3;
+        if (additionalCompleted >= MinAdditionalForRating2) return 2;
+        return 1;
+    }
+
     private void OnValidate()
     {
         MaxActionsForRating3 = Mathf.Max(0, MaxActionsForRating3);
@@ -84,6 +99,12 @@ public class LevelConfig : ScriptableObject
         MaxRageForRating2 = Mathf.Max(
             MaxRageForRating3,
             MaxRageForRating2
+        );
+        MinAdditionalForRating3 = Mathf.Max(0, MinAdditionalForRating3);
+        MinAdditionalForRating2 = Mathf.Clamp(
+            MinAdditionalForRating2,
+            0,
+            MinAdditionalForRating3
         );
     }
 }

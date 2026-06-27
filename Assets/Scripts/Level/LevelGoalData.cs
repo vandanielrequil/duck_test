@@ -20,4 +20,8 @@ public class LevelGoalData
     [Header("Common")]
     public int RequiredAmount = 1;
     public string Description;
+
+    [Tooltip("Additional goals are tracked and shown in UI but do not affect "
+        + "level completion. They contribute to rating separately.")]
+    public bool IsAdditional;
 }

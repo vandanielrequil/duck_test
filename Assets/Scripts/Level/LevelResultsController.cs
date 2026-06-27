@@ -153,9 +153,9 @@ public class LevelResultsController : MonoBehaviour, ILevelResultsActions
         var sb = new StringBuilder();
         foreach (LevelGoalResultLine line in lines)
         {
+            string prefix = line.IsAdditional ? "[bonus]" : (line.Complete ? "[x]" : "[ ]");
             sb.AppendLine(
-                $"{(line.Complete ? "[x]" : "[ ]")} "
-                + $"{line.Description} ({line.Current}/{line.Required})"
+                $"{prefix} {line.Description} ({line.Current}/{line.Required})"
             );
         }
 
@@ -172,9 +172,11 @@ public class LevelResultsController : MonoBehaviour, ILevelResultsActions
         var sb = new StringBuilder();
         foreach (LevelGoalRuntime goal in goals)
         {
+            string prefix = goal.Config.IsAdditional
+                ? "[bonus]"
+                : (goal.IsComplete ? "[x]" : "[ ]");
             sb.AppendLine(
-                $"{(goal.IsComplete ? "[x]" : "[ ]")} "
-                + $"{goal.GetDisplayDescription()} "
+                $"{prefix} {goal.GetDisplayDescription()} "
                 + $"({goal.Current}/{goal.Config.RequiredAmount})"
             );
         }
