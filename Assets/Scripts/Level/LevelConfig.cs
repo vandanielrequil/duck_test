@@ -43,14 +43,33 @@ public class LevelConfig : ScriptableObject
         + "1/3 for anything above.")]
     public int MaxActionsForRating2 = 4;
 
-    public int ComputeRating(int actionsUsed)
+    [Header("Rating (max rage inclusive)")]
+    [Tooltip("3/3 if rage accumulated is at most this value.")]
+    public int MaxRageForRating3 = 0;
+
+    [Tooltip("2/3 if rage accumulated is at most this value (and above Rating 3). "
+        + "1/3 for anything above.")]
+    public int MaxRageForRating2 = 2;
+
+    // Final rating = min(actions rating, rage rating).
+    public int ComputeRating(int actionsUsed, int rageAccumulated)
     {
-        if (actionsUsed <= MaxActionsForRating3)
-            return 3;
+        int actionsRating = ComputeActionsRating(actionsUsed);
+        int rageRating    = ComputeRageRating(rageAccumulated);
+        return Mathf.Min(actionsRating, rageRating);
+    }
 
-        if (actionsUsed <= MaxActionsForRating2)
-            return 2;
+    private int ComputeActionsRating(int actionsUsed)
+    {
+        if (actionsUsed <= MaxActionsForRating3) return 3;
+        if (actionsUsed <= MaxActionsForRating2) return 2;
+        return 1;
+    }
 
+    private int ComputeRageRating(int rageAccumulated)
+    {
+        if (rageAccumulated <= MaxRageForRating3) return 3;
+        if (rageAccumulated <= MaxRageForRating2) return 2;
         return 1;
     }
 
@@ -60,6 +79,11 @@ public class LevelConfig : ScriptableObject
         MaxActionsForRating2 = Mathf.Max(
             MaxActionsForRating3,
             MaxActionsForRating2
+        );
+        MaxRageForRating3 = Mathf.Max(0, MaxRageForRating3);
+        MaxRageForRating2 = Mathf.Max(
+            MaxRageForRating3,
+            MaxRageForRating2
         );
     }
 }

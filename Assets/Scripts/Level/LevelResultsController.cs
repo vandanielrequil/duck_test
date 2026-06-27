@@ -127,6 +127,7 @@ public class LevelResultsController : MonoBehaviour, ILevelResultsActions
         lines.AppendLine($"Reason: {snapshot.Reason}");
         lines.AppendLine($"Approved: {snapshot.ObjectsApproved}");
         lines.AppendLine($"Actions: {snapshot.ActionsUsed}");
+        lines.AppendLine($"Rage: {snapshot.RageAccumulated}");
         lines.AppendLine($"Rating: {FormatRating(snapshot.Rating)}");
         lines.AppendLine();
 

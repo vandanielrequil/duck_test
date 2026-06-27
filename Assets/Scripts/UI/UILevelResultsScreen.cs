@@ -10,6 +10,7 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
     [SerializeField] private string _bodyName = "Body";
     [SerializeField] private string _taskProgressName = "TaskProgress";
     [SerializeField] private string _actionsUsedName = "ActionsUsed";
+    [SerializeField] private string _rageAccumulatedName = "RageAccumulated";
     [SerializeField] private string _ratingName = "Rating";
 
     [Header("Button names")]
@@ -21,6 +22,7 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
     private TextElement _body;
     private TextElement _taskProgress;
     private TextElement _actionsUsed;
+    private TextElement _rageAccumulated;
     private TextElement _rating;
     private Button _nextButton;
     private Button _retryButton;
@@ -48,6 +50,7 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
         _body = FindText(root, _bodyName);
         _taskProgress = FindText(root, _taskProgressName);
         _actionsUsed = FindText(root, _actionsUsedName);
+        _rageAccumulated = FindText(root, _rageAccumulatedName);
         _rating = FindText(root, _ratingName);
         _nextButton = FindButton(root, _nextButtonName);
         _retryButton = FindButton(root, _retryButtonName);
@@ -73,6 +76,9 @@ public class UILevelResultsScreen : LevelResultsFacadeBase
 
         if (_actionsUsed != null)
             _actionsUsed.text = $"Actions: {snapshot.ActionsUsed}";
+
+        if (_rageAccumulated != null)
+            _rageAccumulated.text = $"Rage: {snapshot.RageAccumulated}";
 
         if (_rating != null)
             _rating.text =

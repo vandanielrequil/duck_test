@@ -118,7 +118,10 @@ public class InspectorController : MonoBehaviour
         int angerDelta = GetAngerDelta(duckiness, outcome);
 
         if (angerDelta > 0)
+        {
             _anger.AddAnger(angerDelta);
+            _levelManager?.RegisterRage(angerDelta);
+        }
 
         _levelManager?.ReportInspection(obj, outcome, duckiness);
         OnInspectionResolved?.Invoke(obj, outcome, duckiness);

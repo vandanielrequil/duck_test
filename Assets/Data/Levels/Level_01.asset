@@ -39,3 +39,5 @@ MonoBehaviour:
     LoseOnRageBarFull: 1
   MaxActionsForRating3: 1
   MaxActionsForRating2: 2
+  MaxRageForRating3: 0
+  MaxRageForRating2: 2

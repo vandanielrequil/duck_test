@@ -9,11 +9,13 @@ public class LevelManager : MonoBehaviour
     private LevelConfig _config;
     private int _objectsApproved;
     private int _actionsUsed;
+    private int _rageAccumulated;
 
     public LevelConfig CurrentConfig => _config;
     public IReadOnlyList<LevelGoalRuntime> Goals => _goals;
     public int ObjectsApproved => _objectsApproved;
     public int ActionsUsed => _actionsUsed;
+    public int RageAccumulated => _rageAccumulated;
 
     public event Action<LevelGoalRuntime> OnGoalProgress;
     public event Action OnAllGoalsComplete;
@@ -23,6 +25,7 @@ public class LevelManager : MonoBehaviour
         _config = config;
         _objectsApproved = 0;
         _actionsUsed = 0;
+        _rageAccumulated = 0;
         _goals.Clear();
 
         if (config?.Goals == null)
@@ -38,6 +41,14 @@ public class LevelManager : MonoBehaviour
             return;
 
         _actionsUsed++;
+    }
+
+    public void RegisterRage(int delta)
+    {
+        if (_config == null || delta <= 0)
+            return;
+
+        _rageAccumulated += delta;
     }
 
     public bool AllGoalsComplete
@@ -148,8 +159,9 @@ public class LevelManager : MonoBehaviour
             GoalLines = lines,
             ObjectsApproved = _objectsApproved,
             ActionsUsed = _actionsUsed,
+            RageAccumulated = _rageAccumulated,
             Rating = outcome == LevelEndOutcome.Success && _config != null
-                ? _config.ComputeRating(_actionsUsed)
+                ? _config.ComputeRating(_actionsUsed, _rageAccumulated)
                 : 0,
         };
     }

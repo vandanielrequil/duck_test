@@ -45,5 +45,6 @@ public struct LevelResultsSnapshot
     public LevelGoalResultLine[] GoalLines;
     public int ObjectsApproved;
     public int ActionsUsed;
+    public int RageAccumulated;
     public int Rating;
 }

@@ -2,6 +2,7 @@
     <ui:GroupBox style="height: 266px; align-items: center; justify-content: space-around;">
         <ui:Label name="TaskProgress" text="TaskProgress " style="white-space: pre-wrap; align-self: center; background-color: rgb(255, 255, 255); min-width: 31%;"/>
         <ui:Label name="ActionsUsed" text="Actions: 0" style="align-self: center; font-size: 18px;"/>
+        <ui:Label name="RageAccumulated" text="Rage: 0" style="align-self: center; font-size: 18px;"/>
         <ui:Label name="Rating" text="Rating: -" style="align-self: center; font-size: 22px; -unity-font-style: bold;"/>
         <ui:Button text="Next level" name="Next" style="height: 37px; width: 173px; -unity-text-align: middle-center; white-space: nowrap; justify-content: flex-start; align-items: auto; align-self: center; top: auto;"/>
         <ui:Button text="Retry" name="Retry" parse-escape-sequences="false" style="height: 37px; width: 173px; -unity-text-align: middle-center; white-space: nowrap; justify-content: flex-start; align-items: auto; align-self: center; top: auto;"/>
