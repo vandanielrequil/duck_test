@@ -28,9 +28,11 @@ MonoBehaviour:
     MinDuckiness: 1
     MergeInputA: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
     MergeInputB: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+    MergeInputC: {fileID: 0}
     MergeResult: {fileID: 0}
     RequiredAmount: 1
     Description: Approve imposter
+    IsAdditional: 0
   BaseInspectionDuration: 1
   AngerThresholdTier1: 3
   AngerThresholdTier2: 6
@@ -41,3 +43,7 @@ MonoBehaviour:
     LoseOnRageBarFull: 1
   MaxActionsForRating3: 1
   MaxActionsForRating2: 2
+  MaxRageForRating3: 2
+  MaxRageForRating2: 3
+  MinAdditionalForRating3: 0
+  MinAdditionalForRating2: 0

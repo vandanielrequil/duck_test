@@ -15,6 +15,7 @@ public class LevelGoalData
     [Header("Merge")]
     public PipeObjectData MergeInputA;
     public PipeObjectData MergeInputB;
+    public PipeObjectData MergeInputC;
     public PipeObjectData MergeResult;
 
     [Header("Common")]

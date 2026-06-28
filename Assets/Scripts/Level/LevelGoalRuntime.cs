@@ -62,7 +62,8 @@ public class LevelGoalRuntime
 
     public bool MatchesMergePair(
         PipeObjectData inputA,
-        PipeObjectData inputB
+        PipeObjectData inputB,
+        PipeObjectData inputC = null
     )
     {
         if (Config.Type != GoalType.MergePair)
@@ -71,10 +72,42 @@ public class LevelGoalRuntime
         if (inputA == null || inputB == null)
             return false;
 
+        if (Config.MergeInputC != null)
+        {
+            if (inputC == null)
+                return false;
+
+            return MatchesMergeTriple(
+                inputA,
+                inputB,
+                inputC,
+                Config.MergeInputA,
+                Config.MergeInputB,
+                Config.MergeInputC
+            );
+        }
+
         return (inputA == Config.MergeInputA
                 && inputB == Config.MergeInputB)
             || (inputA == Config.MergeInputB
                 && inputB == Config.MergeInputA);
+    }
+
+    private static bool MatchesMergeTriple(
+        PipeObjectData inputA,
+        PipeObjectData inputB,
+        PipeObjectData inputC,
+        PipeObjectData cfgA,
+        PipeObjectData cfgB,
+        PipeObjectData cfgC
+    )
+    {
+        return (inputA == cfgA && inputB == cfgB && inputC == cfgC)
+            || (inputA == cfgA && inputB == cfgC && inputC == cfgB)
+            || (inputA == cfgB && inputB == cfgA && inputC == cfgC)
+            || (inputA == cfgB && inputB == cfgC && inputC == cfgA)
+            || (inputA == cfgC && inputB == cfgA && inputC == cfgB)
+            || (inputA == cfgC && inputB == cfgB && inputC == cfgA);
     }
 
     public bool MatchesMergeResult(PipeObjectData result)
@@ -97,7 +130,11 @@ public class LevelGoalRuntime
             GoalType.ApproveArchetype =>
                 $"Approve {Config.TargetArchetype} x{Config.RequiredAmount}",
             GoalType.MergePair =>
-                $"Merge {Config.MergeInputA?.name} + {Config.MergeInputB?.name} x{Config.RequiredAmount}",
+                Config.MergeInputC != null
+                    ? $"Merge {Config.MergeInputA?.name} + {Config.MergeInputB?.name} "
+                      + $"+ {Config.MergeInputC?.name} x{Config.RequiredAmount}"
+                    : $"Merge {Config.MergeInputA?.name} + {Config.MergeInputB?.name} "
+                      + $"x{Config.RequiredAmount}",
             GoalType.MergeToResult =>
                 $"Create {Config.MergeResult?.name} x{Config.RequiredAmount}",
             _ => Config.Type.ToString(),

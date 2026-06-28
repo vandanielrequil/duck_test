@@ -162,6 +162,7 @@ public class PipeObjectState
     public PipeObjectData ObjectData { get; }
     public PipeObjectData MergeInputA { get; }
     public PipeObjectData MergeInputB { get; }
+    public PipeObjectData MergeInputC { get; }
     public bool HasPaint { get; }
     public bool HasKit { get; }
 
@@ -183,7 +184,7 @@ public class PipeObjectState
     }
 
     public PipeObjectState(PipeObjectData data)
-        : this(data, null, null, false, false)
+        : this(data, null, null, null, false, false)
     {
     }
 
@@ -191,6 +192,7 @@ public class PipeObjectState
         PipeObjectData data,
         PipeObjectData mergeInputA,
         PipeObjectData mergeInputB,
+        PipeObjectData mergeInputC,
         bool hasPaint,
         bool hasKit
     )
@@ -198,6 +200,7 @@ public class PipeObjectState
         ObjectData = data;
         MergeInputA = mergeInputA;
         MergeInputB = mergeInputB;
+        MergeInputC = mergeInputC;
         HasPaint = hasPaint;
         HasKit = hasKit;
     }
@@ -235,10 +238,31 @@ public class PipeObjectState
                 return false;
         }
 
+        PipeObjectData modifierData = inputB;
+        PipeObjectData mergeA;
+        PipeObjectData mergeB;
+        PipeObjectData mergeC;
+
+        if (MergeInputA == null && MergeInputB == null)
+        {
+            mergeA = inputA;
+            mergeB = modifierData;
+            mergeC = null;
+        }
+        else if (MergeInputC == null)
+        {
+            mergeA = MergeInputA;
+            mergeB = MergeInputB;
+            mergeC = modifierData;
+        }
+        else
+            return false;
+
         next = new PipeObjectState(
             ObjectData,
-            inputA,
-            inputB,
+            mergeA,
+            mergeB,
+            mergeC,
             hasPaint,
             hasKit
         );

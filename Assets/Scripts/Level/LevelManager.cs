@@ -121,7 +121,8 @@ public class LevelManager : MonoBehaviour
 
             if (goal.MatchesMergePair(
                     obj.State?.MergeInputA,
-                    obj.State?.MergeInputB
+                    obj.State?.MergeInputB,
+                    obj.State?.MergeInputC
                 ))
             {
                 goal.AddProgress();
