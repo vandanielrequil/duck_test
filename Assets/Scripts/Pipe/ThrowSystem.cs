@@ -50,8 +50,16 @@ public class ThrowSystem : MonoBehaviour
 
         if (obj != null)
         {
+            if (obj.IsClickOnCooldown)
+                return;
+
             _levelManager?.RegisterAction();
-            TryLaunchByWeight(obj);
+            obj.RegisterClick();
+
+            if (IsKit(obj))
+                TryJumpInPlace(obj);
+            else
+                TryLaunchByWeight(obj);
         }
     }
 
@@ -80,11 +88,56 @@ public class ThrowSystem : MonoBehaviour
         return null;
     }
 
+    private static bool IsKit(PipeObject obj) =>
+        obj?.State?.ObjectData?.Archetype == PipeArchetype.Modifier
+        && obj.State.ObjectData.ModifierType == PipeModifierType.Kit;
+
+    private void TryJumpInPlace(PipeObject obj)
+    {
+        if (obj == null || _flightRoutine != null)
+            return;
+
+        _flightRoutine = StartCoroutine(JumpInPlaceRoutine(obj));
+    }
+
+    private IEnumerator JumpInPlaceRoutine(PipeObject obj)
+    {
+        if (obj == null)
+        {
+            _flightRoutine = null;
+            yield break;
+        }
+
+        _pipeline.IsPaused = true;
+
+        Vector2 origin = obj.transform.position;
+        float jumpHeight = _arcPerSlot * GetFlightArcMultiplier(obj);
+        float duration = _minFlightTime;
+        float elapsed = 0f;
+
+        obj.BeginFlight();
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            Vector2 pos = origin + Vector2.up * (Mathf.Sin(t * Mathf.PI) * jumpHeight);
+            obj.SetFlightPosition(pos);
+            yield return null;
+        }
+
+        obj.SetFlightPosition(origin);
+        obj.EndFlight();
+        _pipeline.IsPaused = false;
+        _flightRoutine = null;
+    }
+
     public bool TryLaunchByWeight(PipeObject obj)
     {
         if (obj == null || _pipeline == null || obj.CurrentSlot == null)
             return false;
 
+        int fromIndex = obj.CurrentSlot.Index;
         int slotsToFly = GetWeight(obj) * GetThrowDirection(obj);
         PipeSlot targetSlot = _pipeline.GetSlotAtOffset(obj, slotsToFly);
 
@@ -93,7 +146,7 @@ public class ThrowSystem : MonoBehaviour
 
         _pipeline.IsPaused = true;
         _flightRoutine = StartCoroutine(
-            FlyToSlotRoutine(obj, targetSlot, Mathf.Abs(slotsToFly))
+            FlyToSlotRoutine(obj, targetSlot, Mathf.Abs(slotsToFly), fromIndex)
         );
         return true;
     }
@@ -101,7 +154,8 @@ public class ThrowSystem : MonoBehaviour
     private IEnumerator FlyToSlotRoutine(
         PipeObject obj,
         PipeSlot targetSlot,
-        int distanceSlots
+        int distanceSlots,
+        int fromIndex = -1
     )
     {
         if (obj.CurrentSlot != null)
@@ -144,6 +198,23 @@ public class ThrowSystem : MonoBehaviour
             obj.SetFlightPosition(end);
             obj.EndFlight();
 
+            // If the object landed in the eject zone (slot index <= eject slot),
+            // the next pipeline tick will ClearOccupant it, leaving it floating.
+            // Destroy it now as a homerun instead.
+            PipeSlot ejectSlot = _pipeline.GetEjectSlot();
+            if (ejectSlot != null && currentTarget.Index <= ejectSlot.Index)
+            {
+                if (obj.CurrentSlot != null)
+                    obj.CurrentSlot.ClearOccupant();
+                Destroy(obj.gameObject);
+                _pipeline.IsPaused = false;
+                _flightRoutine = null;
+                yield break;
+            }
+
+            // Check for KitKnock before resolving so we can get the kit ref
+            PipeObject kitTarget = currentTarget.OccupiedObject;
+
             InteractionResult result =
                 Resolver != null
                     ? Resolver.ResolveInteraction(obj, currentTarget)
@@ -151,11 +222,116 @@ public class ThrowSystem : MonoBehaviour
 
             _pipeline.MoveOcupasToNewSlot();
 
-            if (result != InteractionResult.Bounce)
+            if (result == InteractionResult.KitKnock && kitTarget != null)
+            {
+                yield return LaunchKnockedKit(
+                    kitTarget,
+                    obj,
+                    fromIndex >= 0 ? fromIndex : obj.CurrentSlot?.Index ?? 0
+                );
+            }
+            else if (result != InteractionResult.Bounce)
+            {
                 _pipeline.IsPaused = false;
+            }
 
             _flightRoutine = null;
             yield break;
+        }
+    }
+
+    private IEnumerator LaunchKnockedKit(
+        PipeObject kit,
+        PipeObject striker,
+        int strikerFromIndex
+    )
+    {
+        if (Resolver == null || kit == null)
+        {
+            _pipeline.IsPaused = false;
+            yield break;
+        }
+
+        PipeSlot kitCurrentSlot = kit.CurrentSlot;
+        if (kitCurrentSlot == null)
+        {
+            _pipeline.IsPaused = false;
+            yield break;
+        }
+
+        if (!Resolver.TryResolveKitKnock(
+                striker,
+                kitCurrentSlot,
+                strikerFromIndex,
+                out PipeSlot kitTarget,
+                out int kitDistance
+            ))
+        {
+            // Kit has nowhere to fly — destroy it, then place striker in its slot.
+            kitCurrentSlot.ClearOccupant();
+            Object.Destroy(kit.gameObject);
+            kitCurrentSlot.SetOccupant(striker);
+            striker.MoveTo(kitCurrentSlot.transform.position);
+            _pipeline.IsPaused = false;
+            yield break;
+        }
+
+        // Atomic swap: manually disconnect Kit from its slot so SetOccupant
+        // doesn't null out Kit's CurrentSlot via the displacement path,
+        // then assign striker to that slot.
+        kit.CurrentSlot = null;
+        kitCurrentSlot.OccupiedObject = null;
+
+        int originalDirection = strikerFromIndex < kitCurrentSlot.Index ? 1 : -1;
+        PipeSlot reboundSlot = _pipeline.GetSlotAtOffset(
+            kitCurrentSlot.Index,
+            1,
+            -originalDirection
+        );
+
+        kitCurrentSlot.SetOccupant(striker);
+        striker.MoveTo(kitCurrentSlot.transform.position);
+
+        // --- Kit and striker fly simultaneously ---
+        kit.BeginFlight();
+        Vector2 kitStart = kit.transform.position;
+
+        Coroutine kitFlight = StartCoroutine(
+            FlyArcSegment(kit, kitStart, kitTarget.transform.position, kitDistance)
+        );
+
+        Coroutine strikerFlight = null;
+        if (reboundSlot != null)
+        {
+            striker.CurrentSlot.ClearOccupant();
+            striker.BeginFlight();
+            Vector2 strikerStart = striker.transform.position;
+            strikerFlight = StartCoroutine(
+                FlyArcSegment(striker, strikerStart, reboundSlot.transform.position, 1)
+            );
+        }
+
+        yield return kitFlight;
+        if (strikerFlight != null)
+            yield return strikerFlight;
+
+        // --- Resolve both landings ---
+        kit.EndFlight();
+        InteractionResult kitResult = Resolver.ResolveInteraction(kit, kitTarget);
+
+        InteractionResult reboundResult = InteractionResult.None;
+        if (reboundSlot != null)
+        {
+            striker.EndFlight();
+            reboundResult = Resolver.ResolveInteraction(striker, reboundSlot);
+        }
+
+        _pipeline.MoveOcupasToNewSlot();
+
+        if (kitResult != InteractionResult.Bounce
+            && reboundResult != InteractionResult.Bounce)
+        {
+            _pipeline.IsPaused = false;
         }
     }
 

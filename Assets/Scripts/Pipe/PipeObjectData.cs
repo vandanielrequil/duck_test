@@ -91,6 +91,10 @@ public class PipeObjectData : ScriptableObject
     [Tooltip("Visual flight arc height multiplier.")]
     public float FlightArcMultiplier = 1f;
 
+    [Tooltip("Minimum seconds between clicks on this object. 0 = no cooldown.")]
+    [Min(0f)]
+    public float ClickCooldown = 0f;
+
     public bool CanBeMerged = true;
 
     public bool CanBeShoved = true;

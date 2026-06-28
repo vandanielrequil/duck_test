@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcde1234abcd5678ef9012345678abcd, type: 3}
+  m_Name: Level_09
+  m_EditorClassIdentifier: Assembly-CSharp::LevelConfig
+  LevelId: level_01
+  DisplayName: First Croc
+  MoveInterval: 2
+  SpawnQueue:
+  - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+  - Object: {fileID: 0}
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+  - Object: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
+  - Object: {fileID: 0}
+  - Object: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
+  - Object: {fileID: 11400000, guid: a716d5199cc754e4b97ac27e489b255c, type: 2}
+  - Object: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+  QueueStartSlotIndex: 5
+  Goals:
+  - Type: 2
+    ApproveTarget: {fileID: 0}
+    TargetArchetype: 1
+    RequiredTags: 0
+    MinDuckiness: 1
+    MergeInputA: {fileID: 11400000, guid: ea567c3f08b6251468da8a65ffd3adbe, type: 2}
+    MergeInputB: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
+    MergeInputC: {fileID: 11400000, guid: a716d5199cc754e4b97ac27e489b255c, type: 2}
+    MergeResult: {fileID: 0}
+    RequiredAmount: 1
+    Description: Approve PERFECT imposter
+    IsAdditional: 0
+  - Type: 0
+    ApproveTarget: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}
+    TargetArchetype: 1
+    RequiredTags: 0
+    MinDuckiness: 3
+    MergeInputA: {fileID: 0}
+    MergeInputB: {fileID: 0}
+    MergeInputC: {fileID: 0}
+    MergeResult: {fileID: 0}
+    RequiredAmount: 2
+    Description: Approve duck
+    IsAdditional: 1
+  BaseInspectionDuration: 0.7
+  AngerThresholdTier1: 3
+  AngerThresholdTier2: 6
+  AngerMax: 7
+  EndRules:
+    WinOnPipelineDrained: 1
+    WinOnGoalsComplete: 1
+    LoseOnRageBarFull: 1
+  MaxActionsForRating3: 5
+  MaxActionsForRating2: 8
+  MaxRageForRating3: 4
+  MaxRageForRating2: 7
+  MinAdditionalForRating3: 1
+  MinAdditionalForRating2: 0

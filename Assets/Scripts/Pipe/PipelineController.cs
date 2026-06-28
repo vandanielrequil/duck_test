@@ -308,13 +308,24 @@ public class PipelineController : MonoBehaviour, IPipelineControl
         if (obj?.CurrentSlot == null || _slots == null)
             return null;
 
-        int targetIndex = obj.CurrentSlot.Index + signedOffset;
+        return GetSlotAtOffset(obj.CurrentSlot.Index, signedOffset);
+    }
+
+    public PipeSlot GetSlotAtOffset(int fromIndex, int signedOffset)
+    {
+        if (_slots == null)
+            return null;
+
+        int targetIndex = fromIndex + signedOffset;
 
         if (targetIndex < 0 || targetIndex >= _slots.Count)
             return null;
 
         return _slots[targetIndex];
     }
+
+    public PipeSlot GetSlotAtOffset(int fromIndex, int distance, int direction)
+        => GetSlotAtOffset(fromIndex, distance * direction);
 
     public PipeObject GetOccupantNearWorldX(
         float worldX,

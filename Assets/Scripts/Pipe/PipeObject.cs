@@ -14,6 +14,14 @@ public class PipeObject : MonoBehaviour
     private bool _followEnabled = true;
     private SpriteRenderer _spriteRenderer;
     private GameObject _visualInstance;
+    private float _lastClickTime = float.NegativeInfinity;
+
+    public bool IsClickOnCooldown =>
+        State?.ObjectData != null
+        && State.ObjectData.ClickCooldown > 0f
+        && Time.time - _lastClickTime < State.ObjectData.ClickCooldown;
+
+    public void RegisterClick() => _lastClickTime = Time.time;
 
     private void Awake()
     {

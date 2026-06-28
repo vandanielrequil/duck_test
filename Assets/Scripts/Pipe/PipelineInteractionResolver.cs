@@ -157,6 +157,62 @@ public class PipelineInteractionResolver : MonoBehaviour
         return kind;
     }
 
+    // Returns the slot Kit should fly to after being knocked, and the distance.
+    // movingFromIndex: the slot the moving object started from (before flight).
+    public bool TryResolveKitKnock(
+        PipeObject movingObject,
+        PipeSlot kitSlot,
+        int movingFromIndex,
+        out PipeSlot kitTargetSlot,
+        out int kitFlyDistance
+    )
+    {
+        kitTargetSlot = null;
+        kitFlyDistance = 0;
+
+        if (movingObject == null || kitSlot == null || _pipeline == null)
+            return false;
+
+        PipeObject kit = kitSlot.OccupiedObject;
+        if (kit == null || !IsKit(kit))
+            return false;
+
+        int movingWeight = GetWeight(movingObject);
+        kitFlyDistance = Mathf.Clamp(3 - movingWeight, 1, 2);
+
+        // Direction: same as the moving object's flight vector
+        int direction = movingFromIndex < kitSlot.Index ? 1 : -1;
+
+        return TryGetSlideTargetSlot(
+            kitSlot.Index,
+            kitFlyDistance,
+            direction,
+            out kitTargetSlot,
+            out kitFlyDistance
+        );
+    }
+
+    public InteractionResult ResolveKitKnock(
+        PipeObject movingObject,
+        PipeSlot kitSlot
+    )
+    {
+        PipeObject kit = kitSlot?.OccupiedObject;
+        if (kit == null)
+            return InteractionResult.Bounce;
+
+        // Moving object lands where Kit was; Kit will be launched by ThrowSystem
+        if (movingObject.CurrentSlot != null)
+            movingObject.CurrentSlot.ClearOccupant();
+
+        kitSlot.ClearOccupant();
+        kitSlot.SetOccupant(movingObject);
+        movingObject.MoveTo(kitSlot.transform.position);
+
+        Debug.Log($"Interaction: KitKnock");
+        return InteractionResult.KitKnock;
+    }
+
     private InteractionResult DetermineInteraction(
         PipeObject moving,
         PipeObject target
@@ -171,6 +227,9 @@ public class PipelineInteractionResolver : MonoBehaviour
 
         if (CanMerge(moving, target))
             return InteractionResult.Merge;
+
+        if (IsKit(target))
+            return InteractionResult.KitKnock;
 
         if (IsWeightBasedPair(m, t))
         {
@@ -266,6 +325,10 @@ public class PipelineInteractionResolver : MonoBehaviour
     private static bool IsPaint(PipeObject obj) =>
         obj?.State?.ObjectData?.Archetype == PipeArchetype.Modifier
         && obj.State.ObjectData.ModifierType == PipeModifierType.Paint;
+
+    private static bool IsKit(PipeObject obj) =>
+        obj?.State?.ObjectData?.Archetype == PipeArchetype.Modifier
+        && obj.State.ObjectData.ModifierType == PipeModifierType.Kit;
 
     private static bool IsDuckPaintPair(
         PipeObject moving,
@@ -467,5 +530,6 @@ public enum InteractionResult
     Shove,
     Bounce,
     HomerunLeft,
-    HomerunRight
+    HomerunRight,
+    KitKnock,
 }

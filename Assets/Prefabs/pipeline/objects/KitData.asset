@@ -29,3 +29,4 @@ MonoBehaviour:
   CanBeMerged: 1
   CanBeShoved: 1
   DefaultInteraction: 4
+  ClickCooldown: 1
