@@ -20,6 +20,15 @@ MonoBehaviour:
   FakePaintVisualPrefab: {fileID: 0}
   FakeKitVisualPrefab: {fileID: 0}
   FakePaintKitVisualPrefab: {fileID: 0}
+  IdleSprite: {fileID: 21300000, guid: 1a8c3e5f70924b61d8e0f2a3456789bc, type: 3}
+  FlySprite: {fileID: 21300000, guid: 4dbf618203c57e94012325d6789abcef, type: 3}
+  LandingSprite: {fileID: 21300000, guid: 5ec0729314d68fa5124336e789abcd01, type: 3}
+  HappySprites:
+  - {fileID: 21300000, guid: 2b9d4f6081a35c72e9f103b456789acd, type: 3}
+  - {fileID: 21300000, guid: 3cae507192b46d83f01214c56789abde, type: 3}
+  SurprisedSprites:
+  - {fileID: 21300000, guid: 6fd183a425e790b6235447f89abcde12, type: 3}
+  - {fileID: 21300000, guid: 70e294b536f8a1c734655809abcdef23, type: 3}
   BaseDuckiness: 3
   ModifierType: 0
   FollowSpeed: 1.5

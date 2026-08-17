@@ -116,11 +116,18 @@ public class ThrowSystem : MonoBehaviour
         float elapsed = 0f;
 
         obj.BeginFlight();
+        bool apexNotified = false;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
+            if (!apexNotified && t >= 0.5f)
+            {
+                apexNotified = true;
+                obj.NotifyFlightApex();
+            }
+
             Vector2 pos = origin + Vector2.up * (Mathf.Sin(t * Mathf.PI) * jumpHeight);
             obj.SetFlightPosition(pos);
             yield return null;
@@ -352,16 +359,26 @@ public class ThrowSystem : MonoBehaviour
             * Mathf.Max(1, distanceSlots)
             * GetFlightArcMultiplier(obj);
         float elapsed = 0f;
+        bool apexNotified = false;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
+            if (!apexNotified && t >= 0.5f)
+            {
+                apexNotified = true;
+                obj.NotifyFlightApex();
+            }
+
             Vector2 pos = Vector2.Lerp(start, end, t)
                 + Vector2.up * (Mathf.Sin(t * Mathf.PI) * arc);
             obj.SetFlightPosition(pos);
             yield return null;
         }
+
+        if (!apexNotified)
+            obj.NotifyFlightApex();
 
         obj.SetFlightPosition(end);
     }

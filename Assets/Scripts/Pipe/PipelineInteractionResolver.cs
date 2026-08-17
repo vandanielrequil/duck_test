@@ -29,6 +29,8 @@ public class PipelineInteractionResolver : MonoBehaviour
             return InteractionResult.Move;
         }
 
+        targetObject.PlaySurprised();
+
         InteractionResult kind =
             DetermineInteraction(movingObject, targetObject);
 
@@ -80,6 +82,8 @@ public class PipelineInteractionResolver : MonoBehaviour
 
         if (!IsDuckPaintPair(movingObject, blocker))
             return false;
+
+        blocker.PlaySurprised();
 
         flyDistance = previousSlideHits == 0
             ? GetWeight(movingObject)

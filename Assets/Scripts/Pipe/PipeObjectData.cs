@@ -69,6 +69,13 @@ public class PipeObjectData : ScriptableObject
     [FormerlySerializedAs("FakePaintKitSprite")]
     public GameObject FakePaintKitVisualPrefab;
 
+    [Header("Poses")]
+    public Sprite IdleSprite;
+    public Sprite FlySprite;
+    public Sprite LandingSprite;
+    public Sprite[] HappySprites = System.Array.Empty<Sprite>();
+    public Sprite[] SurprisedSprites = System.Array.Empty<Sprite>();
+
     [Header("Gameplay")]
     [Range(0, 3)]
     public int BaseDuckiness;

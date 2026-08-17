@@ -13,8 +13,10 @@ public class PipeObject : MonoBehaviour
     private float _visualZ;
     private bool _followEnabled = true;
     private SpriteRenderer _spriteRenderer;
+    private SpriteRenderer _poseRenderer;
     private GameObject _visualInstance;
     private float _lastClickTime = float.NegativeInfinity;
+    private PipeObjectPose _pose = PipeObjectPose.Idle;
 
     public bool IsClickOnCooldown =>
         State?.ObjectData != null
@@ -35,13 +37,14 @@ public class PipeObject : MonoBehaviour
     )
     {
         State = new PipeObjectState(data);
-
+        _pose = PipeObjectPose.Idle;
         ApplyVisual();
     }
 
     public void Initialize(PipeObjectState state)
     {
         State = state;
+        _pose = PipeObjectPose.Idle;
         ApplyVisual();
     }
 
@@ -60,6 +63,8 @@ public class PipeObject : MonoBehaviour
             if (_spriteRenderer != null)
                 _spriteRenderer.enabled = true;
 
+            _poseRenderer = _spriteRenderer;
+            ApplyCurrentPose();
             return;
         }
 
@@ -73,6 +78,8 @@ public class PipeObject : MonoBehaviour
         _visualInstance.transform.localPosition = Vector3.zero;
         _visualInstance.transform.localRotation = Quaternion.identity;
         _visualInstance.transform.localScale = Vector3.one;
+        _poseRenderer = _visualInstance.GetComponentInChildren<SpriteRenderer>();
+        ApplyCurrentPose();
     }
 
     public void MoveTo(Vector3 targetWorldPosition)
@@ -95,7 +102,17 @@ public class PipeObject : MonoBehaviour
     public void SetAimPosition(Vector2 worldPosition) =>
         SetWorldPosition(worldPosition);
 
-    public void BeginFlight() => _followEnabled = false;
+    public void BeginFlight()
+    {
+        _followEnabled = false;
+        SetPose(PipeObjectPose.Fly);
+    }
+
+    public void NotifyFlightApex()
+    {
+        if (_pose == PipeObjectPose.Fly)
+            SetPose(PipeObjectPose.Landing);
+    }
 
     public void SetFlightPosition(Vector2 worldPosition) =>
         SetWorldPosition(worldPosition);
@@ -104,6 +121,7 @@ public class PipeObject : MonoBehaviour
     {
         _targetPosition = transform.position;
         _followEnabled = true;
+        SetPose(PipeObjectPose.Idle);
     }
 
     private void SetWorldPosition(Vector2 worldPosition)
@@ -138,6 +156,79 @@ public class PipeObject : MonoBehaviour
 
     public void OnEject()
     {
+        SetPose(PipeObjectPose.Happy);
+    }
+
+    public void PlaySurprised()
+    {
+        SetPose(PipeObjectPose.Surprised);
+    }
+
+    private void SetPose(PipeObjectPose pose)
+    {
+        _pose = pose;
+        ApplyCurrentPose();
+    }
+
+    private void ApplyCurrentPose()
+    {
+        if (_poseRenderer == null)
+            return;
+
+        Sprite sprite = ResolvePoseSprite(_pose);
+        if (sprite != null)
+            _poseRenderer.sprite = sprite;
+    }
+
+    private Sprite ResolvePoseSprite(PipeObjectPose pose)
+    {
+        PipeObjectData data = State?.ObjectData;
+        if (data == null)
+            return null;
+
+        switch (pose)
+        {
+            case PipeObjectPose.Fly:
+                return data.FlySprite != null ? data.FlySprite : data.IdleSprite;
+            case PipeObjectPose.Landing:
+                return data.LandingSprite != null
+                    ? data.LandingSprite
+                    : data.IdleSprite;
+            case PipeObjectPose.Happy:
+                return PickRandomSprite(data.HappySprites) ?? data.IdleSprite;
+            case PipeObjectPose.Surprised:
+                return PickRandomSprite(data.SurprisedSprites) ?? data.IdleSprite;
+            default:
+                return data.IdleSprite;
+        }
+    }
+
+    private static Sprite PickRandomSprite(Sprite[] sprites)
+    {
+        if (sprites == null || sprites.Length == 0)
+            return null;
+
+        int count = 0;
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            if (sprites[i] != null)
+                count++;
+        }
+
+        if (count == 0)
+            return null;
+
+        int pick = Random.Range(0, count);
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            if (sprites[i] == null)
+                continue;
+            if (pick == 0)
+                return sprites[i];
+            pick--;
+        }
+
+        return null;
     }
 
     public bool TryApplyModifier(
@@ -304,4 +395,13 @@ public class PipeObjectState
             ? ObjectData.FakeVisualPrefab
             : ObjectData.DisplayVisualPrefab;
     }
+}
+
+public enum PipeObjectPose
+{
+    Idle,
+    Fly,
+    Landing,
+    Happy,
+    Surprised,
 }
