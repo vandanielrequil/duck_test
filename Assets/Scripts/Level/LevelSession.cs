@@ -11,6 +11,8 @@ public class LevelSession : MonoBehaviour
     [SerializeField] private LevelResultsController _resultsController;
     [SerializeField] private LevelMenuController _menuController;
     [SerializeField] private LevelPauseController _pauseController;
+    [SerializeField] private SpriteRenderer _background;
+    [SerializeField] private Camera _backgroundCamera;
 
     [Header("Debug")]
     [SerializeField] private bool _autoStartLevelForDebug;
@@ -23,6 +25,8 @@ public class LevelSession : MonoBehaviour
     private bool _isPaused;
     private bool _pipelinePausedBeforePause;
     private float _timeScaleBeforePause = 1f;
+    private int _fittedScreenWidth;
+    private int _fittedScreenHeight;
 
     public LevelDatabase Database => _database;
     public int ActiveLevelIndex => _levelIndex;
@@ -52,6 +56,9 @@ public class LevelSession : MonoBehaviour
             _pauseController = FindAnyObjectByType<LevelPauseController>();
 
         _pauseController?.BindInspector(_inspector);
+
+        if (_backgroundCamera == null)
+            _backgroundCamera = Camera.main;
 
         if (_levelManager != null)
             _levelManager.OnAllGoalsComplete += HandleAllGoalsComplete;
@@ -153,6 +160,7 @@ public class LevelSession : MonoBehaviour
         _inspector?.CancelInspection();
         _pipeline?.StopPipeline();
         _pauseController?.HideAll();
+        HideLevelBackground();
 
         if (_gameState != null)
             _gameState.SetState(PipeGameState.MainMenu);
@@ -194,6 +202,7 @@ public class LevelSession : MonoBehaviour
 
         _pauseController?.BindInspector(_inspector);
         _pauseController?.ShowGameHud();
+        ApplyLevelBackground(_activeConfig.Background);
 
         Debug.Log(
             $"[LevelSession] Started {_activeConfig.DisplayName} "
@@ -332,5 +341,69 @@ public class LevelSession : MonoBehaviour
                 "[LevelSession] Level ended without results controller."
             );
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (_background == null || !_background.gameObject.activeInHierarchy)
+            return;
+
+        if (Screen.width == _fittedScreenWidth
+            && Screen.height == _fittedScreenHeight)
+            return;
+
+        FitBackgroundToCamera();
+    }
+
+    private void ApplyLevelBackground(Sprite sprite)
+    {
+        if (_background == null)
+            return;
+
+        _background.sprite = sprite;
+        _background.gameObject.SetActive(sprite != null);
+        if (sprite != null)
+            FitBackgroundToCamera();
+    }
+
+    private void HideLevelBackground()
+    {
+        if (_background != null)
+            _background.gameObject.SetActive(false);
+    }
+
+    private void FitBackgroundToCamera()
+    {
+        if (_background == null || _background.sprite == null)
+            return;
+
+        Camera cam = _backgroundCamera != null
+            ? _backgroundCamera
+            : Camera.main;
+        if (cam == null || !cam.orthographic)
+            return;
+
+        _fittedScreenWidth = Screen.width;
+        _fittedScreenHeight = Screen.height;
+
+        Vector2 spriteSize = _background.sprite.bounds.size;
+        if (spriteSize.x <= 0.0001f || spriteSize.y <= 0.0001f)
+            return;
+
+        float worldHeight = cam.orthographicSize * 2f;
+        float worldWidth = worldHeight * cam.aspect;
+        float scale = Mathf.Max(
+            worldWidth / spriteSize.x,
+            worldHeight / spriteSize.y
+        );
+
+        Transform backgroundTransform = _background.transform;
+        Vector3 cameraPosition = cam.transform.position;
+        backgroundTransform.position = new Vector3(
+            cameraPosition.x,
+            cameraPosition.y,
+            backgroundTransform.position.z
+        );
+        backgroundTransform.localScale = new Vector3(scale, scale, 1f);
     }
 }

@@ -10,6 +10,10 @@ public class LevelConfig : ScriptableObject
     public string LevelId = "level_01";
     public string DisplayName = "Level 1";
 
+    [Header("Presentation")]
+    [Tooltip("World-space background shown while this level is playing.")]
+    public Sprite Background;
+
     [Header("Pipeline")]
     public float MoveInterval = 1.5f;
 

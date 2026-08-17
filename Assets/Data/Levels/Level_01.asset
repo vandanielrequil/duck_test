@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelConfig
   LevelId: level_01
   DisplayName: First Duck
+  Background: {fileID: 6479179425391635100, guid: 08f05298b705b0444be3a417e72342c1, type: 3}
   MoveInterval: 1.5
   SpawnQueue:
   - Object: {fileID: 11400000, guid: e9373428f10aef5409311e5a6507ba8d, type: 2}

@@ -508,7 +508,7 @@ GameObject:
   - component: {fileID: 277043283}
   - component: {fileID: 277043282}
   m_Layer: 0
-  m_Name: duck_test_0
+  m_Name: LevelBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -563,7 +563,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 6583215417537112244, guid: 626b7189042b83443bea07703a03b897, type: 3}
+  m_Sprite: {fileID: 6479179425391635100, guid: 08f05298b705b0444be3a417e72342c1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -583,7 +583,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9256653, y: 0.9256653, z: 0.9256653}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1303,6 +1303,8 @@ MonoBehaviour:
   _resultsController: {fileID: 990001009}
   _menuController: {fileID: 990001007}
   _pauseController: {fileID: 990001008}
+  _background: {fileID: 277043282}
+  _backgroundCamera: {fileID: 519420031}
   _autoStartLevelForDebug: 0
   _ignoreSaveForTesting: 1
   _debugStartLevelIndex: 0

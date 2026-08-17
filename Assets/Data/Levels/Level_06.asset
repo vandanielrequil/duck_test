@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelConfig
   LevelId: level_01
   DisplayName: First Croc
+  Background: {fileID: 6479179425391635100, guid: 08f05298b705b0444be3a417e72342c1, type: 3}
   MoveInterval: 2
   SpawnQueue:
   - Object: {fileID: 11400000, guid: 90a29f9e203b6084bb20be5141115990, type: 2}
