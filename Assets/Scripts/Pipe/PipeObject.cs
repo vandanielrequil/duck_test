@@ -159,9 +159,16 @@ public class PipeObject : MonoBehaviour
         SetPose(PipeObjectPose.Happy);
     }
 
-    public void PlaySurprised()
+    public bool PlaySurprised()
     {
-        SetPose(PipeObjectPose.Surprised);
+        Sprite sprite = PickRandomSprite(State?.ObjectData?.SurprisedSprites);
+        if (sprite == null)
+            return false;
+
+        _pose = PipeObjectPose.Surprised;
+        if (_poseRenderer != null)
+            _poseRenderer.sprite = sprite;
+        return true;
     }
 
     private void SetPose(PipeObjectPose pose)

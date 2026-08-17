@@ -29,8 +29,6 @@ public class PipelineInteractionResolver : MonoBehaviour
             return InteractionResult.Move;
         }
 
-        targetObject.PlaySurprised();
-
         InteractionResult kind =
             DetermineInteraction(movingObject, targetObject);
 
@@ -43,16 +41,19 @@ public class PipelineInteractionResolver : MonoBehaviour
                 break;
 
             case InteractionResult.Shove:
+                targetObject.PlaySurprised();
                 ShoveObject(targetObject);
                 MoveObjectToSlot(movingObject, targetSlot);
                 break;
 
             case InteractionResult.Move:
+                targetObject.PlaySurprised();
                 MoveTargetBehind(targetObject);
                 MoveObjectToSlot(movingObject, targetSlot);
                 break;
 
             case InteractionResult.Bounce:
+                targetObject.PlaySurprised();
                 BounceObject(movingObject);
                 break;
         }
@@ -496,6 +497,12 @@ public class PipelineInteractionResolver : MonoBehaviour
         if (target.CurrentSlot != null)
             target.CurrentSlot.ClearOccupant();
 
+        if (target.PlaySurprised())
+        {
+            StartCoroutine(DestroyAfterHitPose(target, 0.35f));
+            return;
+        }
+
         Destroy(target.gameObject);
     }
 
@@ -507,8 +514,17 @@ public class PipelineInteractionResolver : MonoBehaviour
         if (_pipeline != null)
             _pipeline.IsPaused = true;
 
+        obj.PlaySurprised();
         obj.MoveTo(obj.transform.position + Vector3.down);
         StartCoroutine(DestroyAfterBounce(obj, 0.35f));
+    }
+
+    private IEnumerator DestroyAfterHitPose(PipeObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (obj != null)
+            Destroy(obj.gameObject);
     }
 
     private IEnumerator DestroyAfterBounce(

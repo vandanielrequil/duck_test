@@ -33,8 +33,9 @@ MonoBehaviour:
   ModifierType: 0
   FollowSpeed: 1.5
   Weight: 2
-  FlightSpeedMultiplier: 1
+  FlightSpeedMultiplier: 0.3
   FlightArcMultiplier: 20
+  ClickCooldown: 0
   CanBeMerged: 1
   CanBeShoved: 1
   DefaultInteraction: 3
