@@ -20,6 +20,20 @@ MonoBehaviour:
   FakePaintVisualPrefab: {fileID: 1899981239418425701, guid: d3d89f875b161ac4a986ab6659139067, type: 3}
   FakeKitVisualPrefab: {fileID: 1899981239418425701, guid: 4663538e492efb1498856945db7d2e42, type: 3}
   FakePaintKitVisualPrefab: {fileID: 1899981239418425701, guid: 4faae68a0621be64e8293b3147bb2573, type: 3}
+  IdleSprite: {fileID: 2867768538083782009, guid: 334ab5ba1aa0b0141a28a23bcd22fc8d, type: 3}
+  FlySprite: {fileID: 0}
+  LandingSprite: {fileID: 0}
+  HappySprites: []
+  SurprisedSprites: []
+  PaintSprite: {fileID: -3158490087797073690, guid: 889a88e9d8558094fbd0668e6e77cb37, type: 3}
+  KitSprites:
+  - {fileID: 3476118523933718002, guid: 534d610234edd0d4c8ab50acf89c358c, type: 3}
+  - {fileID: -6779311192967975302, guid: 9501fd729a991e647a8e8927d2da7b3e, type: 3}
+  - {fileID: -6182329080453759407, guid: 1af22b3825b3c4142bb3c8d951f9169c, type: 3}
+  PaintKitSprites:
+  - {fileID: -8941075917311867792, guid: dcff7215e1924734fb8bf062e314331a, type: 3}
+  - {fileID: -2544528364030541637, guid: 36d879680f86809489295e8aa134df6b, type: 3}
+  - {fileID: -2946588654015267219, guid: c734b611a78405b44bd654c6532203fb, type: 3}
   BaseDuckiness: 0
   ModifierType: 0
   FollowSpeed: 1

@@ -76,6 +76,16 @@ public class PipeObjectData : ScriptableObject
     public Sprite[] HappySprites = System.Array.Empty<Sprite>();
     public Sprite[] SurprisedSprites = System.Array.Empty<Sprite>();
 
+    [Header("Fake merge sprites")]
+    [Tooltip("Fake + Paint, no Kit.")]
+    public Sprite PaintSprite;
+
+    [Tooltip("Fake + Kit variants in order: Road, Toy, Hat.")]
+    public Sprite[] KitSprites = System.Array.Empty<Sprite>();
+
+    [Tooltip("Fake + Paint + Kit, same order as KitSprites: Road, Toy, Hat.")]
+    public Sprite[] PaintKitSprites = System.Array.Empty<Sprite>();
+
     [Header("Gameplay")]
     [Range(0, 3)]
     public int BaseDuckiness;

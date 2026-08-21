@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PipeObject : MonoBehaviour
@@ -9,6 +10,7 @@ public class PipeObject : MonoBehaviour
         State != null ? State.Duckiness : 0;
 
     private const float FallbackFollowSpeed = 8f;
+    private const float SurprisedDuration = 2f;
     private Vector2 _targetPosition;
     private float _visualZ;
     private bool _followEnabled = true;
@@ -17,6 +19,7 @@ public class PipeObject : MonoBehaviour
     private GameObject _visualInstance;
     private float _lastClickTime = float.NegativeInfinity;
     private PipeObjectPose _pose = PipeObjectPose.Idle;
+    private Coroutine _surprisedRoutine;
 
     public bool IsClickOnCooldown =>
         State?.ObjectData != null
@@ -38,6 +41,7 @@ public class PipeObject : MonoBehaviour
     {
         State = new PipeObjectState(data);
         _pose = PipeObjectPose.Idle;
+        StopSurprisedRoutine();
         ApplyVisual();
     }
 
@@ -45,6 +49,7 @@ public class PipeObject : MonoBehaviour
     {
         State = state;
         _pose = PipeObjectPose.Idle;
+        StopSurprisedRoutine();
         ApplyVisual();
     }
 
@@ -168,11 +173,35 @@ public class PipeObject : MonoBehaviour
         _pose = PipeObjectPose.Surprised;
         if (_poseRenderer != null)
             _poseRenderer.sprite = sprite;
+        SyncVisualCollider();
+
+        StopSurprisedRoutine();
+        _surprisedRoutine = StartCoroutine(SurprisedTimeoutRoutine());
         return true;
+    }
+
+    private IEnumerator SurprisedTimeoutRoutine()
+    {
+        yield return new WaitForSeconds(SurprisedDuration);
+        _surprisedRoutine = null;
+        if (_pose == PipeObjectPose.Surprised)
+            SetPose(PipeObjectPose.Idle);
+    }
+
+    private void StopSurprisedRoutine()
+    {
+        if (_surprisedRoutine == null)
+            return;
+
+        StopCoroutine(_surprisedRoutine);
+        _surprisedRoutine = null;
     }
 
     private void SetPose(PipeObjectPose pose)
     {
+        if (pose != PipeObjectPose.Surprised)
+            StopSurprisedRoutine();
+
         _pose = pose;
         ApplyCurrentPose();
     }
@@ -185,6 +214,23 @@ public class PipeObject : MonoBehaviour
         Sprite sprite = ResolvePoseSprite(_pose);
         if (sprite != null)
             _poseRenderer.sprite = sprite;
+
+        SyncVisualCollider();
+    }
+
+    private void SyncVisualCollider()
+    {
+        if (_poseRenderer == null || _poseRenderer.sprite == null)
+            return;
+
+        BoxCollider2D visualCollider =
+            _poseRenderer.GetComponent<BoxCollider2D>();
+        if (visualCollider == null)
+            return;
+
+        Bounds bounds = _poseRenderer.sprite.bounds;
+        visualCollider.offset = bounds.center;
+        visualCollider.size = bounds.size;
     }
 
     private Sprite ResolvePoseSprite(PipeObjectPose pose)
@@ -193,20 +239,22 @@ public class PipeObject : MonoBehaviour
         if (data == null)
             return null;
 
+        Sprite display = State.GetDisplaySprite();
+
         switch (pose)
         {
             case PipeObjectPose.Fly:
-                return data.FlySprite != null ? data.FlySprite : data.IdleSprite;
+                return data.FlySprite != null ? data.FlySprite : display;
             case PipeObjectPose.Landing:
                 return data.LandingSprite != null
                     ? data.LandingSprite
-                    : data.IdleSprite;
+                    : display;
             case PipeObjectPose.Happy:
-                return PickRandomSprite(data.HappySprites) ?? data.IdleSprite;
+                return PickRandomSprite(data.HappySprites) ?? display;
             case PipeObjectPose.Surprised:
-                return PickRandomSprite(data.SurprisedSprites) ?? data.IdleSprite;
+                return PickRandomSprite(data.SurprisedSprites) ?? display;
             default:
-                return data.IdleSprite;
+                return display;
         }
     }
 
@@ -271,6 +319,7 @@ public class PipeObjectState
     public PipeObjectData MergeInputC { get; }
     public bool HasPaint { get; }
     public bool HasKit { get; }
+    public CrocKitVariant KitVariant { get; }
 
     public int Duckiness
     {
@@ -290,7 +339,7 @@ public class PipeObjectState
     }
 
     public PipeObjectState(PipeObjectData data)
-        : this(data, null, null, null, false, false)
+        : this(data, null, null, null, false, false, CrocKitVariant.None)
     {
     }
 
@@ -300,7 +349,8 @@ public class PipeObjectState
         PipeObjectData mergeInputB,
         PipeObjectData mergeInputC,
         bool hasPaint,
-        bool hasKit
+        bool hasKit,
+        CrocKitVariant kitVariant
     )
     {
         ObjectData = data;
@@ -309,6 +359,7 @@ public class PipeObjectState
         MergeInputC = mergeInputC;
         HasPaint = hasPaint;
         HasKit = hasKit;
+        KitVariant = kitVariant;
     }
 
     public bool TryAddModifier(
@@ -325,6 +376,7 @@ public class PipeObjectState
 
         bool hasPaint = HasPaint;
         bool hasKit = HasKit;
+        CrocKitVariant kitVariant = KitVariant;
 
         switch (modifier)
         {
@@ -338,6 +390,7 @@ public class PipeObjectState
                 if (hasKit)
                     return false;
                 hasKit = true;
+                kitVariant = PickRandomKitVariant(ObjectData);
                 break;
 
             default:
@@ -370,9 +423,35 @@ public class PipeObjectState
             mergeB,
             mergeC,
             hasPaint,
-            hasKit
+            hasKit,
+            kitVariant
         );
         return true;
+    }
+
+    public Sprite GetDisplaySprite()
+    {
+        if (ObjectData == null)
+            return null;
+
+        if (HasKit)
+        {
+            int index = (int)KitVariant;
+            if (HasPaint)
+                return GetIndexedSprite(ObjectData.PaintKitSprites, index)
+                    ?? ObjectData.PaintSprite
+                    ?? ObjectData.IdleSprite;
+
+            return GetIndexedSprite(ObjectData.KitSprites, index)
+                ?? ObjectData.IdleSprite;
+        }
+
+        if (HasPaint)
+            return ObjectData.PaintSprite != null
+                ? ObjectData.PaintSprite
+                : ObjectData.IdleSprite;
+
+        return ObjectData.IdleSprite;
     }
 
     public GameObject GetVisualPrefab()
@@ -383,24 +462,51 @@ public class PipeObjectState
         if (ObjectData.Archetype != PipeArchetype.Fake)
             return ObjectData.DisplayVisualPrefab;
 
-        if (HasPaint && HasKit)
-            return ObjectData.FakePaintKitVisualPrefab != null
-                ? ObjectData.FakePaintKitVisualPrefab
-                : ObjectData.DisplayVisualPrefab;
-
-        if (HasPaint)
-            return ObjectData.FakePaintVisualPrefab != null
-                ? ObjectData.FakePaintVisualPrefab
-                : ObjectData.DisplayVisualPrefab;
-
-        if (HasKit)
-            return ObjectData.FakeKitVisualPrefab != null
-                ? ObjectData.FakeKitVisualPrefab
-                : ObjectData.DisplayVisualPrefab;
-
         return ObjectData.FakeVisualPrefab != null
             ? ObjectData.FakeVisualPrefab
             : ObjectData.DisplayVisualPrefab;
+    }
+
+    private static CrocKitVariant PickRandomKitVariant(PipeObjectData data)
+    {
+        int count = CountSprites(data?.KitSprites);
+        if (count <= 0)
+            return CrocKitVariant.Road;
+
+        int pick = Random.Range(0, count);
+        int seen = 0;
+        for (int i = 0; i < data.KitSprites.Length; i++)
+        {
+            if (data.KitSprites[i] == null)
+                continue;
+            if (seen == pick)
+                return (CrocKitVariant)i;
+            seen++;
+        }
+
+        return CrocKitVariant.Road;
+    }
+
+    private static Sprite GetIndexedSprite(Sprite[] sprites, int index)
+    {
+        if (sprites == null || index < 0 || index >= sprites.Length)
+            return null;
+        return sprites[index];
+    }
+
+    private static int CountSprites(Sprite[] sprites)
+    {
+        if (sprites == null)
+            return 0;
+
+        int count = 0;
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            if (sprites[i] != null)
+                count++;
+        }
+
+        return count;
     }
 }
 
@@ -411,4 +517,12 @@ public enum PipeObjectPose
     Landing,
     Happy,
     Surprised,
+}
+
+public enum CrocKitVariant
+{
+    None = -1,
+    Road = 0,
+    Toy = 1,
+    Hat = 2,
 }

@@ -20,6 +20,11 @@ MonoBehaviour:
   FakePaintVisualPrefab: {fileID: 0}
   FakeKitVisualPrefab: {fileID: 0}
   FakePaintKitVisualPrefab: {fileID: 0}
+  IdleSprite: {fileID: -312438406057542751, guid: 5c4c97218dd910148b30f948cf3eb7ac, type: 3}
+  FlySprite: {fileID: 0}
+  LandingSprite: {fileID: 0}
+  HappySprites: []
+  SurprisedSprites: []
   BaseDuckiness: 2
   ModifierType: 2
   FollowSpeed: 1
